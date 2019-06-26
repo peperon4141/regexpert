@@ -8,7 +8,7 @@ module.exports = {
       filename: 'index.html', // build時に出力されるファイル名
     },
   },
-  outputDir: "doc",
+  outputDir: "docs",
   devServer: {
     historyApiFallback: {
       rewrites: [
