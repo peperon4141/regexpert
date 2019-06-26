@@ -34,18 +34,15 @@ export default {
 </script>
 
 <style lang="sass">
-$header-height: 40px
-$footer-height: 40px
-
 html
   height: 100%
 
 body
-  height: calc(100% - $header-height - $footer-height)
+  height: calc(100% - 40px - 40px)
 
   > #main
-    margin-bottom: $footer-height
+    margin-bottom: 40px
 
   > footer
-    height: $footer-height
+    height: 40px
 </style>
