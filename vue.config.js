@@ -1,6 +1,10 @@
+// Please check
+// https://cli.vuejs.org/config
+
 const path = require('path')
 
 module.exports = {
+  publicPath: '/regexpert/',
   pages: {
     index: {
       entry: 'src/main.ts', // エントリーポイントとなるjs
