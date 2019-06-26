@@ -1,0 +1,26 @@
+$h2_height: 24px
+$line_width: 4px
+
+section
+  >*:not(h2)
+    margin-left: 8px
+  > h2
+    margin: 12px 0
+    display: flex
+    justify-content: start
+    align-items: center
+    border-left: $line_width solid #343a40
+    font-size: 16px
+    font-weight: bold
+    position: relative
+    padding-left: 20px
+    margin-left: -1px
+    line-height: $h2_height
+    &:before
+      content: ""
+      width: $h2_height / 2
+      height: $line_width
+      background: #343a40
+      position: absolute
+      left: 0
+      top: $h2_height / 2 - $line_width /2
