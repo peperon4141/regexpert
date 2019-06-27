@@ -26,7 +26,7 @@ main.border-left
 </template>
 
 <script>
-import RegularExpressionTextbox from '../components/RegularExpressionTextbox.vue'
+import RegularExpressionTextbox from '@components/RegularExpressionTextbox.vue'
 
 export default {
   components: {
@@ -77,5 +77,5 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-@import "../style/contents.sass"
+@import "@components/style/contents.sass"
 </style>

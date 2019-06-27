@@ -1,6 +1,6 @@
 import { expect } from 'chai'
 import { shallowMount } from '@vue/test-utils'
-import RegularExpressionTextbox from '@/components/RegularExpressionTextbox.vue'
+import RegularExpressionTextbox from '@components/RegularExpressionTextbox.vue'
 
 describe('RegularExpressionTextbox.vue', () => {
   it('renders props.msg when passed', () => {

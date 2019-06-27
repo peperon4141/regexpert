@@ -73,10 +73,10 @@ main.d-flex.flex-row
 </template>
 
 <script>
-import basicLevel from '../quizzes/basic'
-import middleLevel from '../quizzes/middle'
-import highLevel from '../quizzes/high'
-import RegularExpressionTextbox from '../components/RegularExpressionTextbox.vue'
+import basicLevel from '@quizzes/basic'
+import middleLevel from '@quizzes/middle'
+import highLevel from '@quizzes/high'
+import RegularExpressionTextbox from '@components/RegularExpressionTextbox.vue'
 
 export default {
   components: {
@@ -174,7 +174,7 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-@import "../style/contents.sass"
+@import "@components/style/contents.sass"
 
 aside
   min-width: 240px
