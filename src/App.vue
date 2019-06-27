@@ -39,7 +39,7 @@ body
   height: calc(100% - 40px - 40px)
 
   > #main
-    margin-bottom: 40px
+    margin-top: 40px
 
   > footer
     height: 40px
