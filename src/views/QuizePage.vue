@@ -20,13 +20,13 @@ main.d-flex.flex-row
       b-row.d-flex.flex-row
         .col.flex-grow-1
           h3.text-success OK
-          ul
+          ul.pl-0
             li.list-unstyled(v-for="quiz in current_level.list[0].ok")
               font-awesome-icon.mx-2(icon="check-circle" :class="[ check_regular_expression(quiz) ? 'text-success' : 'text-dark' ]")
               span {{ quiz }}
         .col.flex-grow-1
           h3.text-danger NG
-          ul
+          ul.pl-0
             li.list-unstyled(v-for="quiz in current_level.list[0].ng")
               font-awesome-icon.mx-2(icon="check-circle" :class="[ !check_regular_expression(quiz) ? 'text-danger' : 'text-dark' ]")
               span {{ quiz }}
