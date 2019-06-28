@@ -1,5 +1,5 @@
 <template lang="pug">
-div
+#regular-expression-textbox
 	b-form-input.border-dark(
 		v-model='expression'
 		placeholder="正規表現式を書いてください"

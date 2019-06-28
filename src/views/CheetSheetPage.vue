@@ -60,6 +60,5 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-@import "@components/style/contents.sass"
-
+@import "@/style/contents.sass"
 </style>

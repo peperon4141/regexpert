@@ -4,7 +4,7 @@
 const path = require('path')
 
 module.exports = {
-  publicPath: '/regexpert/',
+  publicPath: process.env.NODE_ENV === 'production' ? '/regexpert/' : '/',
   pages: {
     index: {
       entry: 'src/main.ts', // エントリーポイントとなるjs
