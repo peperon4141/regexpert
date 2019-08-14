@@ -1,8 +1,8 @@
 <template lang="pug">
-main.d-flex.flex-row
+main.d-flex.flex-row.mr-0(v-if="0 < quizzes.length")
   .flex-grow-1.mr-1.border-left.d-flex.flex-column.align-items-start
     section.w-100
-      h2 クイズ : {{ current_category.category }} > {{ current_quiz.title }}
+      h2 クイズ : level-{{ current_quiz.level }} > {{ current_quiz.title }}
       p.rule.mb-2(v-if="!!current_quiz.rule") {{ current_quiz.rule }}
       regular-expression-textbox(
         :prefix="'quiz'"
@@ -15,7 +15,7 @@ main.d-flex.flex-row
         .col.flex-grow-1
           h3.text-success OK
           ul.pl-0
-            li.list-unstyled(v-for="(quiz, index) in current_category.list[0].ok")
+            li.list-unstyled(v-for="(quiz, index) in ok")
               font-awesome-icon.mx-2(
                 icon="check-circle"
                 :class="[ check_regular_expression(quiz) ? 'text-success' : 'text-dark' ]"
@@ -24,7 +24,7 @@ main.d-flex.flex-row
         .col.flex-grow-1
           h3.text-danger NG
           ul.pl-0
-            li.list-unstyled(v-for="quiz in current_category.list[0].ng")
+            li.list-unstyled(v-for="quiz in ng")
               font-awesome-icon.mx-2(
                 icon="check-circle"
                 :class="[ !check_regular_expression(quiz) ? 'text-danger' : 'text-dark' ]"
@@ -37,10 +37,11 @@ main.d-flex.flex-row
       b-button-group.m-3(size="lg")
         b-button(variant="secondary" @click.self="next_quiz()") &rsaquo;
         b-button(variant="secondary" @click.self="next_level()") &raquo;
-  aside.p-2.border-left.d-none.d-sm-block
-    b-card.mb-1(
-      v-for="(category, index) in quizzes"
-      :key="`${index}-${category.name}`"
+  aside.border-left.d-none.d-sm-block.d-md-block
+    h3.border-bottom.text-center クイズ選択
+    b-card.m-1(
+      v-for="(level, index) in levels"
+      :key="`level-${level}`"
       no-body
       bg-variant="light"
     )
@@ -49,13 +50,13 @@ main.d-flex.flex-row
         header-tag="header"
         role="tab"
         v-b-toggle="'accordion-' + index"
-        :class="{'text-primary': is_current_level(category)}"
+        :class="{'text-primary': level === current_level }"
       )
-        b-badge(variant="light" pill) {{ category.list.length }}
-        span {{ category.name }}
+        b-badge(variant="light" pill) {{ get_quizzes_in_level(level).length }}
+        span {{ `level-${level}` }}
         b-button.py-0(
           size="sm"
-          @click.self="select_level(category, null)"
+          @click.self="select_level(level)"
           variant="secondary"
         ) 選択
       b-collapse(
@@ -65,18 +66,16 @@ main.d-flex.flex-row
       )
         b-list-group(flush)
           b-list-group-item.py-1.pr-1.d-flex.justify-content-between.align-items-center(
-            v-for="(quiz, index) in category.list"
+            v-for="(quiz, index) in get_quizzes_in_level(level)"
             vertical-align="center"
-            :class="{'text-primary': is_current_quiz(category, quiz)}"
+            :class="{'text-primary': current_quiz === quiz }"
           )
             span {{ quiz.title }}
-            b-button.py-0(size="sm" @click.self="select_level(category, quiz)") 選択
+            b-button.py-0(size="sm" @click.self="select_quiz(quiz)") 選択
 </template>
 
 <script>
-import basicLevel from '@quizzes/basic'
-import middleLevel from '@quizzes/middle'
-import highLevel from '@quizzes/high'
+import axios from 'axios'
 import RegularExpressionTextbox from '@components/RegularExpressionTextbox.vue'
 
 export default {
@@ -85,10 +84,7 @@ export default {
   },
   data() {
     return {
-      basicLevel,
-      middleLevel,
-      highLevel,
-      current_category: null,
+      quizzes: [],
       current_quiz: null,
       expression: '',
       options_str: '',
@@ -96,13 +92,34 @@ export default {
     }
   },
   created: function() {
-    this.current_category = this.basicLevel
-    this.current_quiz = this.basicLevel.list[0]
+    var that = this
+    axios.get('https://script.google.com/macros/s/AKfycbwX35ewjC6DxJV8ehrtI8nex0X3KWKYYv2kEYJJcISfTaYfMX8/exec')
+      .then((res) => {
+        let data = res.data
+        that.quizzes = data
+        that.current_quiz = data[0]
+      })
+      .catch((res) => {
+        console.log(res)
+      })
+ 
   },
   computed: {
-    quizzes: () => [ basicLevel, middleLevel, highLevel ]
+    current_level: function() { return this.current_quiz ? this.current_quiz.level : 1 },
+    ok: function() { return this.current_quiz ? this.current_quiz.ok.split(/\r\n|\n/) : [] },
+    ng: function() { return this.current_quiz ? this.current_quiz.ng.split(/\r\n|\n/) : [] },
+    sorted_quizzes: function() { return this.quizzes.sort( (left, right) => left.level < right.level ) },
+    levels: function() {
+      var set = new Set()
+      this.sorted_quizzes.forEach(item => set.add(item.level) )
+      return Array.from(set)
+    },
+    max_level: function () { return this.levels ? this.levels[this.levels.length - 1] : 1 }
   },
   methods: {
+    get_quizzes_in_level: function (level) {
+      return this.quizzes.filter( item => item.level == level )
+    },
     check_regular_expression: function (target) {
       return RegExp(this.expression, this.options_str).test(target)
     },
@@ -112,63 +129,27 @@ export default {
     update_options_str: function(options) {
       this.options_str = options.join('')
     },
-    select_level: function(level, quiz) {
-      this.current_category = level
-      if (quiz) {
-        this.current_quiz = quiz
-      } else {
-        this.quiz = this.current_category.list[0]
-      }
+    select_level: function(level) {
+      level = Math.max(level, 1)
+      level = Math.min(level, this.max_level)
+      this.select_quiz(this.get_quizzes_in_level(level)[0])
     },
-    is_current_level: function(level) {
-      return this.is_equal(this.current_category, level)
-    },
-    is_current_quiz: function(level, quiz){
-      if (!this.is_current_level(level))  return false
-      return this.is_equal(this.current_quiz, quiz)
-    },
-    is_equal: function(left, right) {
-      return JSON.stringify(left) === JSON.stringify(right)
+    select_quiz: function(quiz) {
+      this.current_quiz = quiz
     },
     prev_level: function() {
-      let current_level_index = this.quizzes.indexOf(this.current_category)
-      let prev_level_index_candidate = current_level_index - 1
-      if (0 <= prev_level_index_candidate) {
-        let prev_level_index = Math.max(prev_level_index_candidate, 0)
-        this.current_category = this.quizzes[prev_level_index]
-        this.current_quiz = this.current_category.list[this.current_category.list.length - 1]
-      }
+      this.select_level(this.current_quiz.level - 1)
     },
     prev_quiz: function() {
-      let current_quiz_index = this.current_category.list.indexOf(this.current_quiz)
-      let prev_quiz_index_candidate = current_quiz_index - 1
-      if (0 <= prev_quiz_index_candidate) {
-        let target_quiz_index = Math.max(prev_quiz_index_candidate, 0) 
-        this.current_quiz = this.current_category.list[target_quiz_index]
-      } else {
-        this.prev_level()
-      }
+      let current_quiz_index = this.quizzes.indexOf(this.current_quiz)
+      this.select_quiz(this.quizzes[Math.max(current_quiz_index - 1, 0)])
     },
     next_level: function() {
-      let current_level_index = this.quizzes.indexOf(this.current_category)
-      let next_level_index_candidate = current_level_index + 1
-      let max_level_index = this.quizzes.length - 1
-      if (next_level_index_candidate <= max_level_index) {
-        let target_level_index = Math.min(next_level_index_candidate, max_level_index)
-        this.current_category = this.quizzes[target_level_index]
-        this.current_quiz = this.quizzes[target_level_index].list[0]
-      }
+      this.select_level(this.current_quiz.level + 1)
     },
     next_quiz: function() {
-      let current_quiz_index = this.current_category.list.indexOf(this.current_quiz)
-      let next_quiz_index_candidate = current_quiz_index + 1
-      let max_quiz_index = this.current_category.list.length - 1
-      if (next_quiz_index_candidate <= max_quiz_index) {
-        let target_quiz_index = Math.min(next_quiz_index_candidate, max_quiz_index) 
-        this.current_quiz = this.current_category.list[target_quiz_index]
-      } else {
-        this.next_level()
-      }
+      let current_quiz_index = this.quizzes.indexOf(this.current_quiz)
+      this.select_quiz(this.quizzes[Math.min(current_quiz_index + 1, this.quizzes.length - 1 )])
     }
   }
 }
@@ -178,7 +159,8 @@ export default {
 @import "@/style/contents.sass"
 
 aside
-  min-width: 240px
+  min-width: 200px
+  width: 30vw
 
 .rotate
   transform: rotate(90deg)

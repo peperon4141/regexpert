@@ -1,5 +1,5 @@
 <template lang="pug">
-main.border-left
+main.border-left.mr-3
   section
     h2 ターゲット
     b-form-textarea.border-dark(

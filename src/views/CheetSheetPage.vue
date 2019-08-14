@@ -1,7 +1,7 @@
 <template lang="pug">
-main.border-left
-  section(v-for="(category, index) in contents")
-    h2 {{ category.name }}
+main.border-left.mr-3
+  section(v-for="(type, index) in contents")
+    h2 {{ type.name }}
     b-table.pr-2(
       style="overflow: hidden"
       fill
@@ -9,9 +9,10 @@ main.border-left
       small
       bordered
       outlined
-      :items="category.list"
+      :items="type.list"
       thead-class="d-none"
     )
+      span(slot="char" slot-scope="data") {{ data.value }}
 </template>
 
 <script>
@@ -20,16 +21,16 @@ export default {
     return {
       contents: [
         {
-          name: 'メタ',
+          name: 'メタキャラクタ',
           list: [
             { char: ".", description: "任意の1文字" },
-            { char: "\w", description: "英単語を構成する文字(a~z,A~Z,_,1~9)" },
-            { char: "\W", description: "英単語を構成する文字以外" },
-            { char: "\s", description: "空白文字(半角スペース,タブ,改行,キャリッジリターン)" },
-            { char: "\S", description: "空白文字以外" },
+            { char: "w", description: "英単語を構成する文字(a~z,A~Z,_,1~9)" },
+            { char: "W", description: "英単語を構成する文字以外" },
+            { char: "s", description: "空白文字(半角スペース,タブ,改行,キャリッジリターン)" },
+            { char: "S", description: "空白文字以外" },
             { char: "\d", description: "半角数字(0~9)" },
-            { char: "\D", description: "半角数字以外" },
-            { char: "\b", description: "単語の境界に一致" },
+            { char: "D", description: "半角数字以外" },
+            { char: "b", description: "単語の境界に一致" },
             { char: "[xyz]", description: "指定された文字のどれかに一致(この場合xyzのいずれかに一致)" },
             { char: "[a-z]", description: "マッチする文字の範囲を指定する表現(この場合aからzまで他には[1-9][A-Z]など文字コードが連続していれば使える。)" },
             { char: "(pattern1|pattern2)", description: "指定されたパターンのどれかにマッチする表現" },
@@ -51,6 +52,15 @@ export default {
           list: [
             { char: "^", description: "文字列の先頭に一致" },
             { char: "$", description: "文字列の末尾に一致" },
+          ],
+        },
+        {
+          name: 'オプションフラグ',
+          list: [
+            { char: "g", description: "文字列全体に対してマッチングするか（無指定の場合は1度マッチングした時点で処理を終了）" },
+            { char: "i", description: "大文字／小文字を区別しない（無指定の場合は区別する）" },
+            { char: "m", description: "複数行の入力文字列を複数行として扱う（^及び$が各行の先頭末尾にマッチする）" },
+            { char: "u", description: "Unicode対応（漢字などを認識してくれるようになる）" },
           ],
         }
       ]
