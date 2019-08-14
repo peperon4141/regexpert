@@ -95,9 +95,9 @@ export default {
     var that = this
     axios.get('https://script.google.com/macros/s/AKfycbwX35ewjC6DxJV8ehrtI8nex0X3KWKYYv2kEYJJcISfTaYfMX8/exec')
       .then((res) => {
-        let data = res.data
-        that.quizzes = data
-        that.current_quiz = data[0]
+        let quizzes = res.data
+        that.quizzes = quizzes.sort( (left, right) => left.level < right.level )
+        that.current_quiz = that.quizzes[0]
       })
       .catch((res) => {
         console.log(res)
@@ -108,17 +108,16 @@ export default {
     current_level: function() { return this.current_quiz ? this.current_quiz.level : 1 },
     ok: function() { return this.current_quiz ? this.current_quiz.ok.split(/\r\n|\n/) : [] },
     ng: function() { return this.current_quiz ? this.current_quiz.ng.split(/\r\n|\n/) : [] },
-    sorted_quizzes: function() { return this.quizzes.sort( (left, right) => left.level < right.level ) },
     levels: function() {
       var set = new Set()
-      this.sorted_quizzes.forEach(item => set.add(item.level) )
+      this.quizzes.forEach(item => set.add(item.level) )
       return Array.from(set)
     },
     max_level: function () { return this.levels ? this.levels[this.levels.length - 1] : 1 }
   },
   methods: {
     get_quizzes_in_level: function (level) {
-      return this.quizzes.filter( item => item.level == level )
+      return this.quizzes.filter( item => item.level === level )
     },
     check_regular_expression: function (target) {
       return RegExp(this.expression, this.options_str).test(target)
@@ -130,22 +129,21 @@ export default {
       this.options_str = options.join('')
     },
     select_level: function(level) {
-      level = Math.max(level, 1)
-      level = Math.min(level, this.max_level)
+      level = Math.min(Math.max(1, level), this.max_level)
       this.select_quiz(this.get_quizzes_in_level(level)[0])
     },
     select_quiz: function(quiz) {
-      this.current_quiz = quiz
+      if (quiz) this.current_quiz = quiz
     },
     prev_level: function() {
       this.select_level(this.current_quiz.level - 1)
     },
+    next_level: function() {
+      this.select_level(this.current_quiz.level + 1)
+    },
     prev_quiz: function() {
       let current_quiz_index = this.quizzes.indexOf(this.current_quiz)
       this.select_quiz(this.quizzes[Math.max(current_quiz_index - 1, 0)])
-    },
-    next_level: function() {
-      this.select_level(this.current_quiz.level + 1)
     },
     next_quiz: function() {
       let current_quiz_index = this.quizzes.indexOf(this.current_quiz)
