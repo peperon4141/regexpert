@@ -11,7 +11,7 @@ body.d-flex.flex-column.h-100
             :to="item.to"
           ) {{ item.name }}
   router-view#main.flex-grow-1.ml-3(role="main")
-  footer.sticky-bottom.bg-dark.text-light.d-flex.justify-content-center.align-items-center Created by 〇〇〇
+  footer.sticky-bottom.bg-dark.text-light.d-flex.justify-content-center.align-items-center Created by Tohru
 </template>
 
 <script>
@@ -25,6 +25,7 @@ export default {
         {name: 'チェッカー', to: '/checker'},
         {name: 'クイズ', to: '/quiz'},
         {name: 'チートシート', to: '/cheetsheet'},
+        {name: 'クイズ追加', to: '/form'},
       ]
     }
   }

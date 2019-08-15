@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import CheckerPage from '@views/CheckerPage.vue'
 import CheetSheetPage from '@views/CheetSheetPage.vue'
 import QuizPage from '@views/QuizePage.vue'
+import AddQuizForm from '@views/AddQuizForm.vue'
 
 Vue.use(Router)
 
@@ -14,6 +15,7 @@ const router = new Router({
     { path: '/checker',component: CheckerPage },
     { path: '/cheetsheet',component: CheetSheetPage },
     { path: '/quiz',component: QuizPage },
+    { path: '/form',component: AddQuizForm },
     { path: '*', redirect: '/checker' },
   ]
 })

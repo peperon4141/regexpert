@@ -1,6 +1,7 @@
 <template lang="pug">
-main.d-flex.flex-row.mr-0(v-if="0 < quizzes.length")
-  .flex-grow-1.mr-1.border-left.d-flex.flex-column.align-items-start
+main.d-flex.flex-row.mr-0
+  loading-icon(v-if="quizzes.length <= 0")
+  .flex-grow-1.mr-1.border-left.d-flex.flex-column.align-items-start(v-else)
     section.w-100
       h2 クイズ : level-{{ current_quiz.level }} > {{ current_quiz.title }}
       p.rule.mb-2(v-if="!!current_quiz.rule") {{ current_quiz.rule }}
@@ -37,7 +38,7 @@ main.d-flex.flex-row.mr-0(v-if="0 < quizzes.length")
       b-button-group.m-3(size="lg")
         b-button(variant="secondary" @click.self="next_quiz()") &rsaquo;
         b-button(variant="secondary" @click.self="next_level()") &raquo;
-  aside.border-left.d-none.d-sm-block.d-md-block
+  aside.border-left.d-none.d-sm-block.d-md-block(v-else)
     h3.border-bottom.text-center クイズ選択
     b-card.m-1(
       v-for="(level, index) in levels"
@@ -77,10 +78,12 @@ main.d-flex.flex-row.mr-0(v-if="0 < quizzes.length")
 <script>
 import axios from 'axios'
 import RegularExpressionTextbox from '@components/RegularExpressionTextbox.vue'
+import LoadingIcon from '@components/LoadingIcon.vue'
 
 export default {
   components: {
-    RegularExpressionTextbox
+    RegularExpressionTextbox,
+    LoadingIcon
   },
   data() {
     return {
@@ -91,7 +94,7 @@ export default {
       results_list: {}
     }
   },
-  created: function() {
+  created: function() {  
     var that = this
     axios.get('https://script.google.com/macros/s/AKfycbwX35ewjC6DxJV8ehrtI8nex0X3KWKYYv2kEYJJcISfTaYfMX8/exec')
       .then((res) => {
