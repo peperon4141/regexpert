@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+
 import CheckerPage from '@views/CheckerPage.vue'
 import CheetSheetPage from '@views/CheetSheetPage.vue'
 import QuizPage from '@views/QuizePage.vue'

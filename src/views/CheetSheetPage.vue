@@ -1,18 +1,19 @@
 <template lang="pug">
-main.border-left.mr-3
-  section(v-for="(type, index) in contents")
-    h2 {{ type.name }}
-    b-table.pr-2(
-      style="overflow: hidden"
-      fill
-      striped
-      small
-      bordered
-      outlined
-      :items="type.list"
-      thead-class="d-none"
-    )
-      span(slot="char" slot-scope="data") {{ data.value }}
+main#main
+  article
+    section(v-for="(type, index) in contents")
+      h2 {{ type.name }}
+      b-table.pr-2(
+        style="overflow: hidden"
+        fill
+        striped
+        small
+        bordered
+        outlined
+        :items="type.list"
+        thead-class="d-none"
+      )
+        span(slot="char" slot-scope="data") {{ data.value }}
 </template>
 
 <script>
@@ -69,6 +70,14 @@ export default {
 }
 </script>
 
-<style lang="sass" scoped>
+<style lang="sass">
 @import "@/style/contents.sass"
+
+#main
+  table
+    table-layout: fixed
+    td
+      &:nth-of-type(1)  
+        width: 20%
+        word-wrap: break-word
 </style>

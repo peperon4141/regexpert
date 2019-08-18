@@ -1,7 +1,7 @@
 <template lang="pug">
-body.d-flex.flex-column.h-100
-  header.fixed-top.bg-dark.py-0.w-100
-    b-navbar.py-0(toggleable="sm" type="dark")
+body.d-flex.flex-column.bg-dark
+  header.sticky-top
+    b-navbar(toggleable="sm" type="dark")
       b-navbar-brand.font-italic.m-0(variant="faded" tag="h1") Regexpert
       b-navbar-toggle.border-0(target="nav-collapse")
       b-collapse#nav-collapse(is-nav)
@@ -10,8 +10,9 @@ body.d-flex.flex-column.h-100
             v-for="item in routes"
             :to="item.to"
           ) {{ item.name }}
-  router-view#main.flex-grow-1.ml-3(role="main")
-  footer.sticky-bottom.bg-dark.text-light.d-flex.justify-content-center.align-items-center Created by Tohru
+  router-view.flex-grow-1.bg-white
+  footer.sticky-bottom.d-flex.justify-content-center.align-items-center
+    span.bg-dark.text-light Created by Tohru
 </template>
 
 <script>
@@ -33,16 +34,13 @@ export default {
 </script>
 
 <style lang="sass">
-html
+html, body
   height: 100%
 
 body
-  height: calc(100% - 40px - 40px)
-
-  > #main
-    margin-top: 40px
+  > main
+    overflow-y: scroll
 
   > footer
     height: 40px
-    min-height: 40px
 </style>
