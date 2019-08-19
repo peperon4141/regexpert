@@ -17,17 +17,36 @@ main
       )
     section
       h2
-        span 結果
-        b-badge.ml-2(variant="secondary") {{ results.length }}
-      span(v-if="results.length == 0") 結果はありません。
+        span matchの結果
+        b-badge.ml-2(variant="secondary" v-if="results") {{ results.length }}
+      span(v-if="!results || results.length == 0") 結果はありません。
       ul.pl-1(v-else)
         li.list-unstyled(v-for="result in results")
           font-awesome-icon.mr-2.text-secondary(icon="check")
           span {{ result }}
+    section
+      h2
+        span RegExp.$x変数
+        b-badge.ml-2(variant="secondary") {{ regexp_nums_count }}
+      ul.pl-1
+        li.list-unstyled(v-for="(val, index) in regexp_nums" v-if="!!val")
+          font-awesome-icon.mr-2.text-secondary(icon="check")
+          span ${{index + 1}}: {{ val ? val : 'undefied' }}
+    section
+      h2
+        span RegExpの変数
+        b-badge.ml-2(variant="secondary")
+      ul.pl-1
+        li.list-unstyled(v-for="(val, key) in regexp_vals")
+          font-awesome-icon.mr-2.text-secondary(icon="check")
+          span.d-inline-block(style="width: 108px;") {{key}}:
+          span {{ val }}
 </template>
 
 <script>
 import RegularExpressionTextbox from '@components/RegularExpressionTextbox.vue'
+
+const VAL_NAME = ['input', 'lastMatch', 'lastParen', 'leftContext', 'rightContext']
 
 export default {
   components: {
@@ -38,24 +57,33 @@ export default {
       target: '',
       expression: '',
       options_str: '',
-      results: []
+      results: [],
+      regexp_nums: [],
+      regexp_vals: {},
     }
   },
   computed: {
+    regexp_nums_count: function () {
+      return this.regexp_nums ? this.regexp_nums.filter( item => !!item ).length : 0
+    }
   },
   created: function() {
-    this.restore_target_from_local_storage()
+    this.restore_target()
   },
   methods: {
-    update_results: function() {
+    update_results: function(results, regexp_nums) {
       if(this.target && this.expression) {
         this.results = this.target.match(new RegExp(this.expression, this.options_str))
+        this.regexp_nums = [1,2,3,4,5,6,7,8,9].map( num => RegExp[`$${num}`] )
+        VAL_NAME.forEach( val_name => {
+          this.regexp_vals[val_name] = RegExp[val_name]
+        } )
       }
     },
-    store_target_to_local_storage: function() {
+    store_target: function() {
 			if (this.target) localStorage.setItem('target', this.target)
 		},
-		restore_target_from_local_storage: function() {
+		restore_target: function() {
 			let target = localStorage.getItem('target')
 			this.target = target ? target : ''
 		},
@@ -70,7 +98,7 @@ export default {
   },
   watch: {
     target(){
-      this.store_target_to_local_storage()
+      this.store_target()
       this.update_results()
     },
   }
