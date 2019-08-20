@@ -2,10 +2,10 @@ $h2_line_height: 24px
 $line_width: 4px
 
 main
-  padding: 0 12px
+  height: 100%
+  margin: 0 12px
+  border-left: 1px solid #dee2e6
   > article
-    width: 100%
-    border-left: 1px solid #dee2e6
     section
       padding: 6px 12px
       > h2
@@ -19,12 +19,11 @@ main
         position: relative
         padding-left: 20px
         line-height: $h2_line_height
-        &:not(.collapsed)
-          &:before
-            content: ""
-            width: $h2_line_height / 2
-            height: $line_width
-            background: #343a40
-            position: absolute
-            left: 0
-            top: $h2_line_height / 2 - $line_width /2
+        &:before
+          content: ""
+          width: $h2_line_height / 2
+          height: $line_width
+          background: #343a40
+          position: absolute
+          left: -1px
+          top: $h2_line_height / 2 - $line_width /2

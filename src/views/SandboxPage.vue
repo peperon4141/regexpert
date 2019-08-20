@@ -38,7 +38,8 @@ main
       h2(v-b-toggle.collapse-num-vals)
         span RegExp.$x変数
         b-badge.ml-2(variant="secondary") {{ regexp_nums_count }}
-      b-collapse#collapse-num-vals.mt-2
+        font-awesome-icon.mx-2(:icon="showNumVals ? 'angle-down' : 'angle-up'")
+      b-collapse#collapse-num-vals(v-model="showNumVals")
         ul.pl-1
           li.list-unstyled(v-for="(val, index) in regexp_nums" v-if="!!val")
             font-awesome-icon.mr-2.text-secondary(icon="check")
@@ -48,7 +49,8 @@ main
       h2(v-b-toggle.collapse-vals)
         span RegExpの変数
         b-badge.ml-2(variant="secondary")
-      b-collapse#collapse-vals
+        font-awesome-icon.mx-2(:icon="showVals ? 'angle-down' : 'angle-up'")
+      b-collapse#collapse-vals(v-model="showVals")
         ul.pl-1
           li.list-unstyled(v-for="(val, key) in regexp_vals")
             font-awesome-icon.mr-2.text-secondary(icon="check")
@@ -81,7 +83,9 @@ export default {
       regexp_nums: [],
       regexp_vals: {},
       selection: FUNC_SELECTION,
-      selected: 'match'
+      selected: 'match',
+      showNumVals: false,
+      showVals: false
     }
   },
   computed: {

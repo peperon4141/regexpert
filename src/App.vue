@@ -1,6 +1,6 @@
 <template lang="pug">
-body.d-flex.flex-column.bg-dark
-  header.sticky-top
+body.d-flex.flex-column
+  header.bg-dark.sticky-top
     b-navbar(toggleable="sm" type="dark")
       b-navbar-brand.font-italic.m-0(variant="faded" tag="h1") Regexpert
       b-navbar-toggle.border-0(target="nav-collapse")
@@ -11,8 +11,8 @@ body.d-flex.flex-column.bg-dark
             :to="item.to"
           ) {{ item.name }}
   router-view.flex-grow-1.bg-white
-  footer.sticky-bottom.d-flex.justify-content-center.align-items-center
-    span.bg-dark.text-light Created by Tohru
+  footer.bg-dark.sticky-bottom.d-flex.justify-content-center.align-items-center
+    span.text-light Created by Tohru
 </template>
 
 <script>
@@ -38,6 +38,7 @@ html, body
   height: 100%
 
 body
+  overflow: hidden
   > main
     overflow-y: scroll
 
