@@ -2,6 +2,10 @@
 main
   article
     section
+      h2 関数選択
+      b-form-group
+        b-form-radio(v-for="func in selection" v-model="selected" :value="func" ) {{func}}
+    section
       h2 ターゲット
       b-form-textarea.border-dark(
         v-model="target"
@@ -17,7 +21,7 @@ main
       )
     section
       h2
-        span matchの結果
+        span {{selected}}の結果
         b-badge.ml-2(variant="secondary" v-if="results") {{ results.length }}
       span(v-if="!results || results.length == 0") 結果はありません。
       ul.pl-1(v-else)
@@ -47,6 +51,7 @@ main
 import RegularExpressionTextbox from '@components/RegularExpressionTextbox.vue'
 
 const VAL_NAME = ['input', 'lastMatch', 'lastParen', 'leftContext', 'rightContext']
+const FUNC_SELECTION = ['match', 'replace', 'exec']
 
 export default {
   components: {
@@ -60,6 +65,8 @@ export default {
       results: [],
       regexp_nums: [],
       regexp_vals: {},
+      selection: FUNC_SELECTION,
+      selected: 'match'
     }
   },
   computed: {
@@ -72,13 +79,23 @@ export default {
   },
   methods: {
     update_results: function(results, regexp_nums) {
-      if(this.target && this.expression) {
-        this.results = this.target.match(new RegExp(this.expression, this.options_str))
-        this.regexp_nums = [1,2,3,4,5,6,7,8,9].map( num => RegExp[`$${num}`] )
-        VAL_NAME.forEach( val_name => {
-          this.regexp_vals[val_name] = RegExp[val_name]
-        } )
+      if (!this.target || !this.expression) return
+      let regexp = new RegExp(this.expression, this.options_str)
+      switch (this.selected) {
+        case 'match':
+          this.results = this.target.match(regexp)
+          break
+        case 'replace':
+          this.results = [this.target.replace(regexp, '☆')]
+          break
+        case 'exec':
+          this.results = regexp.exec(this.target)
+          break
       }
+      this.regexp_nums = [1,2,3,4,5,6,7,8,9].map( num => RegExp[`$${num}`] )
+      VAL_NAME.forEach( val_name => {
+        this.regexp_vals[val_name] = RegExp[val_name]
+      } )
     },
     store_target: function() {
 			if (this.target) localStorage.setItem('target', this.target)
@@ -101,6 +118,10 @@ export default {
       this.store_target()
       this.update_results()
     },
+    selected() {
+      this.store_target()
+      this.update_results()
+    }
   }
 }
 </script>

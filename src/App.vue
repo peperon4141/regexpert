@@ -23,8 +23,8 @@ export default {
   data() {
     return {
       routes: [
-        {name: 'チェッカー', to: '/checker'},
         {name: 'クイズ', to: '/quiz'},
+        {name: '砂場', to: '/sandbox'},
         {name: 'チートシート', to: '/cheetsheet'},
         {name: 'クイズ追加', to: '/form'},
       ]

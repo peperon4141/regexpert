@@ -13,11 +13,11 @@ const router = new Router({
   base: process.env.BASE_URL,
   linkActiveClass: 'active',
   routes: [
-    { path: '/checker',component: SandboxPage },
+    { path: '/sandbox',component: SandboxPage },
     { path: '/cheetsheet',component: CheetSheetPage },
     { path: '/quiz',component: QuizPage },
     { path: '/form',component: AddQuizForm },
-    { path: '*', redirect: '/checker' },
+    { path: '*', redirect: '/sandbox' },
   ]
 })
 
