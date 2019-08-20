@@ -33,10 +33,10 @@ main
                 )
                 span {{ quiz }}
       #selector.position-absolute.w-100.d-flex
-        b-button.m-1(size="lg" variant="secondary" @click.self="prev_level()") &laquo;
-        b-button.m-1.mr-auto(size="lg" variant="secondary" @click.self="prev_quiz()") &lsaquo;
-        b-button.m-1(size="lg" variant="secondary" @click.self="next_quiz()") &rsaquo;
-        b-button.m-1(size="lg" variant="secondary" @click.self="next_level()") &raquo;
+        b-button.m-1(size="lg" variant="secondary" @click.self="prev_level()") &laquo;1
+        b-button.m-1.mr-auto(size="lg" variant="secondary" @click.self="prev_quiz()") &lsaquo;2
+        b-button.m-1(size="lg" variant="secondary" @click.self="next_quiz()") 3&rsaquo;
+        b-button.m-1(size="lg" variant="secondary" @click.self="next_level()") 4&raquo;
     #sidebar.border-left.d-none.d-sm-block.d-md-block
       section
         h2 クイズ選択

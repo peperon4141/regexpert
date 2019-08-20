@@ -38,7 +38,9 @@ html, body
   height: 100%
 
 html
+  scroll-behavior: smooth
   touch-action: manipulation
+  background-color: #343a40
 
 body
   overflow: hidden
