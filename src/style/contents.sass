@@ -7,7 +7,7 @@ main
     width: 100%
     border-left: 1px solid #dee2e6
     section
-      padding: 12px
+      padding: 6px 12px
       > h2
         margin: 0 0 12px -13px
         display: flex
@@ -19,11 +19,12 @@ main
         position: relative
         padding-left: 20px
         line-height: $h2_line_height
-        &:before
-          content: ""
-          width: $h2_line_height / 2
-          height: $line_width
-          background: #343a40
-          position: absolute
-          left: 0
-          top: $h2_line_height / 2 - $line_width /2
+        &:not(.collapsed)
+          &:before
+            content: ""
+            width: $h2_line_height / 2
+            height: $line_width
+            background: #343a40
+            position: absolute
+            left: 0
+            top: $h2_line_height / 2 - $line_width /2

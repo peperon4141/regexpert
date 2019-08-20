@@ -4,7 +4,13 @@ main
     section
       h2 関数選択
       b-form-group
-        b-form-radio(v-for="func in selection" v-model="selected" :value="func" ) {{func}}
+        b-form-radio-group(v-model="selected" :options="selection")
+    section(v-if="selected == 'replace'")
+      h2 置換文字列
+      b-form-input.border-dark(
+        v-model='replacedStr'
+        placeholder="置換後の文字列を書いて下さい。"
+      )
     section
       h2 ターゲット
       b-form-textarea.border-dark(
@@ -14,8 +20,8 @@ main
       )
     section
       h2 正規表現
-      regular-expression-textbox(
-        :prefix="'checker'"
+      regular-pattern-textbox(
+        :prefix="'sandbox'"
         :update_expression_callback="update_expression"
         :update_options_callback="update_options_str"
       )
@@ -29,39 +35,48 @@ main
           font-awesome-icon.mr-2.text-secondary(icon="check")
           span {{ result }}
     section
-      h2
+      h2(v-b-toggle.collapse-num-vals)
         span RegExp.$x変数
         b-badge.ml-2(variant="secondary") {{ regexp_nums_count }}
-      ul.pl-1
-        li.list-unstyled(v-for="(val, index) in regexp_nums" v-if="!!val")
-          font-awesome-icon.mr-2.text-secondary(icon="check")
-          span ${{index + 1}}: {{ val ? val : 'undefied' }}
+      b-collapse#collapse-num-vals.mt-2
+        ul.pl-1
+          li.list-unstyled(v-for="(val, index) in regexp_nums" v-if="!!val")
+            font-awesome-icon.mr-2.text-secondary(icon="check")
+            span.d-inline-block(style="width: 108px;") ${{index + 1}}:
+            span {{ val }}
     section
-      h2
+      h2(v-b-toggle.collapse-vals)
         span RegExpの変数
         b-badge.ml-2(variant="secondary")
-      ul.pl-1
-        li.list-unstyled(v-for="(val, key) in regexp_vals")
-          font-awesome-icon.mr-2.text-secondary(icon="check")
-          span.d-inline-block(style="width: 108px;") {{key}}:
-          span {{ val }}
+      b-collapse#collapse-vals
+        ul.pl-1
+          li.list-unstyled(v-for="(val, key) in regexp_vals")
+            font-awesome-icon.mr-2.text-secondary(icon="check")
+            span.d-inline-block(style="width: 108px;") {{key}}:
+            span {{ val }}
 </template>
 
 <script>
-import RegularExpressionTextbox from '@components/RegularExpressionTextbox.vue'
+import RegularPatternTextbox from '@components/RegularPatternTextbox.vue'
 
 const VAL_NAME = ['input', 'lastMatch', 'lastParen', 'leftContext', 'rightContext']
-const FUNC_SELECTION = ['match', 'replace', 'exec']
+const FUNC_SELECTION = [
+  {text: 'match', value: 'match'},
+  {text: 'replace', value: 'replace'},
+  {text: 'exec', value: 'exec'},
+  {text: 'test', value: 'test'}
+]
 
 export default {
   components: {
-    RegularExpressionTextbox
+    RegularPatternTextbox
   },
   data() {
     return {
       target: '',
-      expression: '',
+      pattern: '',
       options_str: '',
+      replacedStr: '',
       results: [],
       regexp_nums: [],
       regexp_vals: {},
@@ -79,17 +94,20 @@ export default {
   },
   methods: {
     update_results: function(results, regexp_nums) {
-      if (!this.target || !this.expression) return
-      let regexp = new RegExp(this.expression, this.options_str)
+      if (!this.target || !this.pattern) return
+      let regexp = new RegExp(this.pattern, this.options_str)
       switch (this.selected) {
         case 'match':
           this.results = this.target.match(regexp)
           break
         case 'replace':
-          this.results = [this.target.replace(regexp, '☆')]
+          this.results = [this.target.replace(regexp, this.replacedStr)]
           break
         case 'exec':
           this.results = regexp.exec(this.target)
+          break
+        case 'test':
+          this.results = [regexp.test(this.target)]
           break
       }
       this.regexp_nums = [1,2,3,4,5,6,7,8,9].map( num => RegExp[`$${num}`] )
@@ -104,8 +122,8 @@ export default {
 			let target = localStorage.getItem('target')
 			this.target = target ? target : ''
 		},
-    update_expression: function(expression) {
-      this.expression = expression
+    update_expression: function(pattern) {
+      this.pattern = pattern
       this.update_results()
     },
     update_options_str: function(options) {
@@ -119,6 +137,10 @@ export default {
       this.update_results()
     },
     selected() {
+      this.store_target()
+      this.update_results()
+    },
+    replacedStr() {
       this.store_target()
       this.update_results()
     }

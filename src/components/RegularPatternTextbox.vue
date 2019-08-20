@@ -1,5 +1,5 @@
 <template lang="pug">
-#regular-expression-textbox
+#regular-pattern-textbox
 	b-form-input.border-dark(
 		v-model='expression'
 		placeholder="正規表現式を書いてください"
@@ -56,7 +56,7 @@ export default {
 		},
 		check_regexp: function() {
 			try {
-				new RegExp(this.expression, this.selected_options)
+				new RegExp(this.expression, this.selected_options.join(''))
 				return true
 			} catch (error) {
 				this.error = error.message

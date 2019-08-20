@@ -6,7 +6,7 @@ main
       section.w-100
         h2 クイズ : level-{{ current_quiz.level }} > {{ current_quiz.title }}
         p.rule.mb-2(v-if="!!current_quiz.rule") {{ current_quiz.rule }}
-        regular-expression-textbox(
+        regular-pattern-textbox(
           :prefix="'quiz'"
           :update_expression_callback="update_expression"
           :update_options_callback="update_options_str"
@@ -77,11 +77,11 @@ main
 
 <script>
 import axios from 'axios'
-import RegularExpressionTextbox from '@components/RegularExpressionTextbox.vue'
+import RegularPatternTextbox from '@components/RegularPatternTextbox.vue'
 
 export default {
   components: {
-    RegularExpressionTextbox
+    RegularPatternTextbox
   },
   data() {
     return {
