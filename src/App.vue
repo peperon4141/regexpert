@@ -37,9 +37,13 @@ export default {
 html, body
   height: 100%
 
+html
+  touch-action: manipulation
+
 body
   overflow: hidden
   > main
+    overflow-x: hidden
     overflow-y: scroll
 
   > footer
