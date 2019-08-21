@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/3.6.3/workbox-sw.js");
 
 importScripts(
-  "/precache-manifest.e308252cf5a7a37c9f8157cb0ff29baf.js"
+  "/precache-manifest.3eab8962fab7bb4fcc63120e359c05ba.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "regexpert"});

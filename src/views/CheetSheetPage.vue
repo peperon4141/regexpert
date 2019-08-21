@@ -1,5 +1,5 @@
 <template lang="pug">
-main#main
+main
   article
     section(v-for="(type, index) in contents")
       h2 {{ type.name }}
@@ -10,16 +10,39 @@ main#main
         small
         bordered
         outlined
+        :fields="fields"
         :items="type.list"
         thead-class="d-none"
       )
-        span(slot="char" slot-scope="data") {{ data.value }}
+        template(slot="sample" slot-scope="row")
+          b-button(size="sm" @click="row.toggleDetails") 詳細
+        template(slot="row-details" slot-scope="row")
+          b-card(body-class="p-1")
+            b-row
+              b-col(sm="3" class="text-sm-right") タイトル:
+              b-col 内容
+            b-row
+              b-col(sm="3" class="text-sm-right") タイトル:
+              b-col 内容
 </template>
 
 <script>
 export default {
   data() {
     return {
+      fields: ['char', 'description', 'sample'],
+      items: [
+        { isActive: true, age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
+        { isActive: false, age: 21, first_name: 'Larsen', last_name: 'Shaw' },
+        {
+          isActive: false,
+          age: 89,
+          first_name: 'Geneva',
+          last_name: 'Wilson',
+          _showDetails: true
+        },
+        { isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' }
+      ],
       contents: [
         {
           name: 'メタキャラクタ',
@@ -70,14 +93,16 @@ export default {
 }
 </script>
 
-<style lang="sass">
+<style lang="sass" scoped>
 @import "@/style/contents.sass"
 
-#main
+main
   table
     table-layout: fixed
-    td
-      &:nth-of-type(1)  
+    ::v-deep td
+      &:first-of-type
         width: 20%
         word-wrap: break-word
+      &:last-of-type
+        width: 58px
 </style>

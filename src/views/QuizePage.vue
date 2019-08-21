@@ -40,35 +40,28 @@ main
     #sidebar.border-left.d-none.d-sm-block.d-md-block
       section
         h2 クイズ選択
-        b-card.m-1(
+        b-card(
+          header-tag="header"
+          no-body
           v-for="(level, index) in levels"
           :key="`level-${level}`"
-          no-body
-          bg-variant="light"
         )
-          b-card-header.p-1.d-flex.justify-content-between.align-items-center(
-            visible
-            header-tag="header"
-            role="tab"
-            v-b-toggle="'accordion-' + index"
+          h6.mb-0.d-flex.justify-content-between(
+            slot="header"
             :class="{'text-primary': level === current_level }"
+            v-b-toggle="'accordion-' + index"
           )
-            b-badge(variant="light" pill) {{ get_quizzes_in_level(level).length }}
+            b-badge.px-2(variant="primary" pill) {{ get_quizzes_in_level(level).length }}
             span {{ `level-${level}` }}
-            b-button.py-0(
-              size="sm"
-              @click.self="select_level(level)"
-              variant="secondary"
-            ) 選択
+            font-awesome-icon.mx-2(:icon="'angle-down'")
           b-collapse(
-            accordion="my-accordion"
             :id="'accordion-' + index"
             role="tabpanel"
+            :visible="level == current_level"
           )
             b-list-group(flush)
-              b-list-group-item.py-1.pr-1.d-flex.justify-content-between.align-items-center(
+              b-list-group-item.py-2.d-flex.justify-content-between(
                 v-for="(quiz, index) in get_quizzes_in_level(level)"
-                vertical-align="center"
                 :class="{'text-primary': current_quiz === quiz }"
               )
                 span {{ quiz.title }}
@@ -178,4 +171,7 @@ main
       width: 20px
       height: 20px
       margin-left: 0 !important
+
+  .card
+    margin-bottom: 12px
 </style>
