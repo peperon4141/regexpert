@@ -12,7 +12,7 @@ body.d-flex.flex-column
           ) {{ item.name }}
   router-view.flex-grow-1.bg-white
   footer.bg-dark.sticky-bottom.d-flex.justify-content-center.align-items-center
-    span.text-light Created by Tohru Ver. 0.1
+    span.text-light Created by Tohru Ver. 0.2
 </template>
 
 <script>
