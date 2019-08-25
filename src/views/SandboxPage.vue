@@ -4,7 +4,7 @@ main#sandbox
     section
       h2 関数選択
       b-form-group
-        b-form-radio-group(v-model="funcType" :options="selection")
+        b-form-radio-group(v-model="funcType" :options="funcSelection")
     section
       h2 正規表現設定
       template(v-if="funcType == 'replace'")
@@ -30,7 +30,8 @@ main#sandbox
     section
       h2
         span 実行結果
-        b-badge.ml-2(variant="secondary" v-if="results") {{ results.length }}
+        b-badge.ml-2(variant="secondary" v-if="time") time: {{ time }}[ms]
+        b-badge.ml-2(variant="secondary" v-if="isArray") count: {{ results.length }}
       span(v-if="!results || results.length == 0") 結果はありません。
       ul.pl-1(v-else)
         li.list-unstyled(v-for="result in results")
@@ -45,30 +46,20 @@ main#sandbox
           b-badge.p-2.pb-3.font-weight-light(variant="secondary") $n変数
           b-table.mt-n2.pr-2.position-relative.bg-secondary.rounded-sm(
             style="overflow: hidden"
-            fill
-            striped
-            small
-            bordered
-            outlined
-            hover
             :fields="fields"
-            :items="regexp_nums"
+            :items="regexpNums"
             thead-class="d-none"
             tbody-class="bg-white"
+            fill striped small bordered outlined hover
           )
         template
           b-badge.p-2.pb-3.font-weight-light(variant="secondary") 変数
           b-table.mt-n2.pr-2.position-relative.bg-secondary.rounded-sm(
             style="overflow: hidden"
-            fill
-            striped
-            small
-            bordered
-            outlined
-            hover
-            :items="regexp_vals"
+            :items="regexpVals"
             thead-class="d-none"
             tbody-class="bg-white"
+            fill striped small bordered outlined hover
           )
 </template>
 
@@ -79,12 +70,14 @@ const FIELDS = [ 'param', 'value' ]
 const NUM_PARAM_NAMES = [1,2,3,4,5,6,7,8,9].map(num => `$${num}`)
 const OTHER_PARAM_NAMES = ['input', 'lastMatch', 'lastParen', 'leftContext', 'rightContext']
 const FUNC_SELECTION = [
-  {text: 'match', value: 'match'},
-  {text: 'replace', value: 'replace'},
-  {text: 'exec', value: 'exec'},
-  {text: 'test', value: 'test'},
-  {text: 'search', value: 'search'}
+  {text: 'match', value: 'match' },
+  {text: 'replace', value: 'replace' },
+  {text: 'exec', value: 'exec' },
+  {text: 'test', value: 'test' },
+  {text: 'search', value: 'search' },
+  {text: 'split', value: 'split' }
 ]
+const REPEAT_COUNT = 100
 
 export default {
   components: {
@@ -92,68 +85,59 @@ export default {
   },
   data() {
     return {
+      funcSelection: FUNC_SELECTION,
       options_str: '',
       results: [],
-      regexp_nums: [],
-      regexp_vals: [],
-      selection: FUNC_SELECTION,
+      regexpNums: [],
+      regexpVals: [],
+      time: null,
+      isArray: false,
       fields: FIELDS
     }
   },
   computed: {
     regexp_nums_count: function () {
-      return this.regexp_nums ? this.regexp_nums.filter( item => !!item.value ).length : 0
+      return this.regexpNums ? this.regexpNums.filter( item => !!item.value ).length : 0
     },
     targetStr: {
       get() { return this.$store.state.sandboxPage.target },
-      set(target) { this.$store.commit('sandboxPageStore/setTarget', target); this.updateResults() }
+      set(target) { this.$store.commit('setTarget', target); this.updateResults() }
     },
     funcType: {
       get() { return this.$store.state.sandboxPage.funcType },
-      set(funcType) { this.$store.commit('sandboxPageStore/setFuncType', funcType); this.updateResults() }
+      set(funcType) { this.$store.commit('setFuncType', funcType); this.updateResults() }
     },
-    // pattern: {
-    //   get() { return this.$store.state.pattern },
-    //   set(pattern) { this.$store.commit('setPattern', pattern); this.updateResults() }
-    // },
     replacement: {
       get() { return this.$store.state.sandboxPage.replacement },
-      set(replacement) { this.$store.commit('sandboxPageStore/setReplacement', replacement); this.updateResults() }
+      set(replacement) { this.$store.commit('setReplacement', replacement); this.updateResults() }
     },
     showVals: {
       get() { return this.$store.state.sandboxPage.showVals },
-      set(showVals) { this.$store.commit('sandboxPageStore/setShowVals', showVals) }
+      set(showVals) { this.$store.commit('setShowVals', showVals) }
     },
   },
   created: function() {
     this.$store.commit('restoreValues')
   },
   methods: {
-    updateResults: function(results, regexp_nums) {
-      this.initializeVariables()
-
-      if (!this.targetStr || !this.pattern) return
-
-      let regexp = new RegExp(this.pattern, this.options_str)
-      regexp.lastIndex = 0
+    runRegexpFunc: function() {
+      const regexp = new RegExp(this.pattern, this.options_str)
       switch (this.funcType) {
-        case 'match':
-          this.results = this.targetStr.match(regexp)
-          break
-        case 'replace':
-          this.results = [this.targetStr.replace(regexp, this.replacedStr)]
-          break
-        case 'exec':
-          this.results = regexp.exec(this.targetStr)
-          break
-        case 'test':
-          this.results = [regexp.test(this.targetStr)]
-          break
-        case 'search':
-          this.results = [this.targetStr.search(regexp)]
-          break
+        case 'match': return this.targetStr.match(regexp)
+        case 'replace': return this.targetStr.replace(regexp, this.replacement)
+        case 'exec': return regexp.exec(this.targetStr)
+        case 'test': return regexp.test(this.targetStr)
+        case 'search': return this.targetStr.search(regexp)
+        case 'split': return this.targetStr.split(regexp)
       }
+    },
+    updateResults: function() {
+      this.initializeVariables()
+      var result = this.runRegexpFunc()
+      this.isArray = Array.isArray(result)
+      this.results = this.isArray ? result : [result]
       this.updateVariables()
+      this.checkPerformance()
     },
     updateExpression: function(pattern) {
       this.pattern = pattern
@@ -164,13 +148,23 @@ export default {
       this.updateResults()
     },
     initializeVariables: function() {
-      this.regexp_nums = NUM_PARAM_NAMES.map( key => { return { param: key, value: '' } })
-      this.regexp_vals = OTHER_PARAM_NAMES.map( key => { return { param: key, value: '' } } )
+      ''.match(RegExp(''))
+      this.regexpNums = NUM_PARAM_NAMES.map( key => { return { param: key, value: '' } })
+      this.regexpVals = OTHER_PARAM_NAMES.map( key => { return { param: key, value: '' } } )
     },
     updateVariables: function() {
-      this.regexp_nums = NUM_PARAM_NAMES.map( key => { return { param: key, value: RegExp[key] } })
-      this.regexp_vals = OTHER_PARAM_NAMES.map( key => { return { param: key, value: RegExp[key] } })
+      this.regexpNums = NUM_PARAM_NAMES.map( key => { return { param: key, value: RegExp[key] } })
+      this.regexpVals = OTHER_PARAM_NAMES.map( key => { return { param: key, value: RegExp[key].toString() } })
     },
+    checkPerformance: function() {
+      this.time = null
+      setTimeout( () => {
+        var start = performance.now()
+        for(let i = 0; i < REPEAT_COUNT; i++){ this.runRegexpFunc() }
+        var end = performance.now()
+        this.time = ((end - start) / REPEAT_COUNT).toFixed(3)
+      }, 10)
+    }
   }
 }
 </script>
