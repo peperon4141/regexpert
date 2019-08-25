@@ -4,28 +4,28 @@ main#sandbox
     section
       h2 関数選択
       b-form-group
-        b-form-radio-group(v-model="selected" :options="selection")
+        b-form-radio-group(v-model="funcType" :options="selection")
     section
       h2 正規表現設定
-      template(v-if="selected == 'replace'")
+      template(v-if="funcType == 'replace'")
         b-badge.p-2.pb-3.font-weight-light(variant="secondary") 置換後文字列
         b-form-input.position-relative.mt-n2.mb-2.border-secondary(
-          v-model='replacedStr'
+          v-model='replacement'
           placeholder="置換後の文字列を書いて下さい。"
         )
       template
-        b-badge.p-2.pb-3.font-weight-light(variant="secondary") ターゲット
+        b-badge.p-2.pb-3.font-weight-light(variant="secondary") ターゲット文字列
         b-form-textarea.position-relative.mt-n2.mb-2.border-secondary(
-          v-model="target"
+          v-model="targetStr"
           rows="6"
           placeholder="正規表現をチェックする対象を入力"
         )
       template
-        b-badge.p-2.pb-3.font-weight-light(variant="secondary") 正規表現
+        b-badge.p-2.pb-3.font-weight-light(variant="secondary") 正規表現パターン
         regular-pattern-textbox.position-relative.mt-n2.mb-2(
           :prefix="'sandbox'"
-          :update_expression_callback="update_expression"
-          :update_options_callback="update_options_str"
+          :update_expression_callback="updateExpression"
+          :update_options_callback="updateOptionsStr"
         )
     section
       h2
@@ -39,8 +39,8 @@ main#sandbox
     section
       h2(v-b-toggle.collapse-vals)
         span RegExp変数
-        font-awesome-icon.mx-2(:icon="show_vals ? 'angle-down' : 'angle-up'")
-      b-collapse#collapse-vals(v-model="show_vals")
+        font-awesome-icon.mx-2(:icon="showVals ? 'angle-down' : 'angle-up'")
+      b-collapse#collapse-vals(v-model="showVals")
         template
           b-badge.p-2.pb-3.font-weight-light(variant="secondary") $n変数
           b-table.mt-n2.pr-2.position-relative.bg-secondary.rounded-sm(
@@ -75,11 +75,9 @@ main#sandbox
 <script>
 import RegularPatternTextbox from '@components/RegularPatternTextbox.vue'
 
-const FIELDS = [
-  { key: 'param' },
-  { key: 'value'}
-]
-const VAL_NAME = ['input', 'lastMatch', 'lastParen', 'leftContext', 'rightContext']
+const FIELDS = [ 'param', 'value' ]
+const NUM_PARAM_NAMES = [1,2,3,4,5,6,7,8,9].map(num => `$${num}`)
+const OTHER_PARAM_NAMES = ['input', 'lastMatch', 'lastParen', 'leftContext', 'rightContext']
 const FUNC_SELECTION = [
   {text: 'match', value: 'match'},
   {text: 'replace', value: 'replace'},
@@ -94,87 +92,85 @@ export default {
   },
   data() {
     return {
-      target: '',
-      pattern: '',
       options_str: '',
-      replacedStr: '',
       results: [],
       regexp_nums: [],
       regexp_vals: [],
       selection: FUNC_SELECTION,
-      selected: 'match',
-      fields: FIELDS,
-      show_vals: false
+      fields: FIELDS
     }
   },
   computed: {
     regexp_nums_count: function () {
       return this.regexp_nums ? this.regexp_nums.filter( item => !!item.value ).length : 0
-    }
+    },
+    targetStr: {
+      get() { return this.$store.state.sandboxPage.target },
+      set(target) { this.$store.commit('sandboxPageStore/setTarget', target); this.updateResults() }
+    },
+    funcType: {
+      get() { return this.$store.state.sandboxPage.funcType },
+      set(funcType) { this.$store.commit('sandboxPageStore/setFuncType', funcType); this.updateResults() }
+    },
+    // pattern: {
+    //   get() { return this.$store.state.pattern },
+    //   set(pattern) { this.$store.commit('setPattern', pattern); this.updateResults() }
+    // },
+    replacement: {
+      get() { return this.$store.state.sandboxPage.replacement },
+      set(replacement) { this.$store.commit('sandboxPageStore/setReplacement', replacement); this.updateResults() }
+    },
+    showVals: {
+      get() { return this.$store.state.sandboxPage.showVals },
+      set(showVals) { this.$store.commit('sandboxPageStore/setShowVals', showVals) }
+    },
   },
   created: function() {
-    this.restore_target()
+    this.$store.commit('restoreValues')
   },
   methods: {
-    update_results: function(results, regexp_nums) {
-      if (!this.target || !this.pattern) return
-      [1,2,3,4,5,6,7,8,9].forEach(num => RegExp[`$${num}`] = '')
-      VAL_NAME.forEach(name => RegExp[name] = '')
+    updateResults: function(results, regexp_nums) {
+      this.initializeVariables()
+
+      if (!this.targetStr || !this.pattern) return
+
       let regexp = new RegExp(this.pattern, this.options_str)
       regexp.lastIndex = 0
-      switch (this.selected) {
+      switch (this.funcType) {
         case 'match':
-          this.results = this.target.match(regexp)
+          this.results = this.targetStr.match(regexp)
           break
         case 'replace':
-          this.results = [this.target.replace(regexp, this.replacedStr)]
+          this.results = [this.targetStr.replace(regexp, this.replacedStr)]
           break
         case 'exec':
-          this.results = regexp.exec(this.target)
+          this.results = regexp.exec(this.targetStr)
           break
         case 'test':
-          this.results = [regexp.test(this.target)]
+          this.results = [regexp.test(this.targetStr)]
           break
         case 'search':
-          this.results = [this.target.search(regexp)]
+          this.results = [this.targetStr.search(regexp)]
           break
       }
-      this.regexp_nums = [1,2,3,4,5,6,7,8,9].map( num => {
-        return { param: `$${num}`, value: RegExp[`$${num}`] }
-      })
-      this.regexp_vals = VAL_NAME.map( name => {
-        return { param: name, value: RegExp[name] }
-      })
+      this.updateVariables()
     },
-    store_target: function() {
-			if (this.target) localStorage.setItem('target', this.target)
-		},
-		restore_target: function() {
-			let target = localStorage.getItem('target')
-      this.target = target ? target : ''
-		},
-    update_expression: function(pattern) {
+    updateExpression: function(pattern) {
       this.pattern = pattern
-      this.update_results()
+      this.updateResults()
     },
-    update_options_str: function(options) {
+    updateOptionsStr: function(options) {
       this.options_str = options.join('')
-      this.update_results()
-    }
-  },
-  watch: {
-    target(){
-      this.store_target()
-      this.update_results()
+      this.updateResults()
     },
-    selected() {
-      this.store_target()
-      this.update_results()
+    initializeVariables: function() {
+      this.regexp_nums = NUM_PARAM_NAMES.map( key => { return { param: key, value: '' } })
+      this.regexp_vals = OTHER_PARAM_NAMES.map( key => { return { param: key, value: '' } } )
     },
-    replacedStr() {
-      this.store_target()
-      this.update_results()
-    }
+    updateVariables: function() {
+      this.regexp_nums = NUM_PARAM_NAMES.map( key => { return { param: key, value: RegExp[key] } })
+      this.regexp_vals = OTHER_PARAM_NAMES.map( key => { return { param: key, value: RegExp[key] } })
+    },
   }
 }
 </script>
@@ -185,8 +181,6 @@ export default {
 main
   table
     table-layout: fixed
-    tbody
-      background-color: red !important
     ::v-deep td
       &:first-of-type
         width: 20%
