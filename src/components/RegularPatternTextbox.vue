@@ -1,6 +1,6 @@
 <template lang="pug">
 #regular-pattern-textbox
-	b-form-input.border-dark(
+	b-form-input.border-secondary(
 		v-model='expression'
 		placeholder="正規表現式を書いてください"
 		aria-describedby="input-live-help input-live-feedback"

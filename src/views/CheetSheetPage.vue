@@ -3,7 +3,7 @@ main
   article
     section(v-for="(type, index) in contents")
       h2 {{ type.name }}
-      b-table.pr-2(
+      b-table.pr-2.position-relative.bg-secondary.rounded-sm(
         style="overflow: hidden"
         fill
         striped
@@ -13,17 +13,19 @@ main
         :fields="fields"
         :items="type.list"
         thead-class="d-none"
+        tbody-class="bg-white"
       )
         template(slot="sample" slot-scope="row")
-          b-button(size="sm" @click="row.toggleDetails") 詳細
+          b-button(
+            size="sm"
+            @click="row.toggleDetails"
+            :class="{disabled: 0 < (row.item.samples || []).length}"
+          ) 詳細
         template(slot="row-details" slot-scope="row")
           b-card(body-class="p-1")
-            b-row
-              b-col(sm="3" class="text-sm-right") タイトル:
-              b-col 内容
-            b-row
-              b-col(sm="3" class="text-sm-right") タイトル:
-              b-col 内容
+            b-row(v-for="(sample, index) in row.item.samples")
+              b-col.text-sm-right(sm="3") {{ index + 1 }}
+              b-col {{ sample }}
 </template>
 
 <script>
@@ -31,23 +33,16 @@ export default {
   data() {
     return {
       fields: ['char', 'description', 'sample'],
-      items: [
-        { isActive: true, age: 40, first_name: 'Dickerson', last_name: 'Macdonald' },
-        { isActive: false, age: 21, first_name: 'Larsen', last_name: 'Shaw' },
-        {
-          isActive: false,
-          age: 89,
-          first_name: 'Geneva',
-          last_name: 'Wilson',
-          _showDetails: true
-        },
-        { isActive: true, age: 38, first_name: 'Jami', last_name: 'Carney' }
-      ],
       contents: [
         {
           name: 'メタキャラクタ',
           list: [
-            { char: ".", description: "任意の1文字" },
+            { char: ".", description: "任意の1文字",
+              samples: [
+                'サンプル１',
+                'サンプル２',
+              ]
+            },
             { char: "w", description: "英単語を構成する文字(a~z,A~Z,_,1~9)" },
             { char: "W", description: "英単語を構成する文字以外" },
             { char: "s", description: "空白文字(半角スペース,タブ,改行,キャリッジリターン)" },

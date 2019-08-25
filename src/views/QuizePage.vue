@@ -4,7 +4,11 @@ main
   article.h-100.d-flex.flex-row(v-else)
     #contents.flex-grow-1.position-relative
       section.w-100
-        h2 クイズ : level-{{ current_quiz.level }} > {{ current_quiz.title }}
+        h2
+          span クイズ :
+          b-badge.mx-2(pill variant="secondary") LEVEL {{ current_quiz.level }}
+          span(v-text="' > '")
+          b-badge.mx-2(pill variant="secondary") {{ current_quiz.title }}
         p.rule.mb-2(v-if="!!current_quiz.rule") {{ current_quiz.rule }}
         regular-pattern-textbox(
           :prefix="'quiz'"
@@ -107,7 +111,8 @@ export default {
       this.quizzes.forEach(item => set.add(item.level) )
       return Array.from(set)
     },
-    max_level: function () { return this.levels ? this.levels[this.levels.length - 1] : 1 }
+    max_level: function () { return this.levels ? this.levels[this.levels.length - 1] : 1 },
+    current_quiz_index: function () { return this.quizzes.indexOf(this.current_quiz) }
   },
   methods: {
     get_quizzes_in_level: function (level) {
@@ -123,26 +128,18 @@ export default {
       this.options_str = options.join('')
     },
     select_level: function(level) {
-      level = Math.min(Math.max(1, level), this.max_level)
-      this.select_quiz(this.get_quizzes_in_level(level)[0])
+      const validated_level = Math.min(Math.max(1, level), this.max_level)
+      this.select_quiz(this.get_quizzes_in_level(validated_level)[0])
     },
-    select_quiz: function(quiz) {
-      if (quiz) this.current_quiz = quiz
+    select_quiz: function(quiz_index) {
+      if (!quiz_index) return
+      const validated_quiz_index = Math.min(Math.max(0, quiz_index), this.quizzes.length - 1)
+      this.current_quiz = this.quizzes[validated_quiz_index]
     },
-    prev_level: function() {
-      this.select_level(this.current_quiz.level - 1)
-    },
-    next_level: function() {
-      this.select_level(this.current_quiz.level + 1)
-    },
-    prev_quiz: function() {
-      let current_quiz_index = this.quizzes.indexOf(this.current_quiz)
-      this.select_quiz(this.quizzes[Math.max(current_quiz_index - 1, 0)])
-    },
-    next_quiz: function() {
-      let current_quiz_index = this.quizzes.indexOf(this.current_quiz)
-      this.select_quiz(this.quizzes[Math.min(current_quiz_index + 1, this.quizzes.length - 1 )])
-    }
+    prev_level: function() { this.select_level(this.current_quiz.level - 1) },
+    next_level: function() { this.select_level(this.current_quiz.level + 1) },
+    prev_quiz: function() { this.select_quiz(this.current_quiz_index - 1) },
+    next_quiz: function() { this.select_quiz(this.current_quiz_index + 1) }
   }
 }
 </script>

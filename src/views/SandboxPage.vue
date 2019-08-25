@@ -5,29 +5,31 @@ main#sandbox
       h2 関数選択
       b-form-group
         b-form-radio-group(v-model="selected" :options="selection")
-    section(v-if="selected == 'replace'")
-      h2 置換文字列
-      b-form-input.border-dark(
-        v-model='replacedStr'
-        placeholder="置換後の文字列を書いて下さい。"
-      )
     section
-      h2 ターゲット
-      b-form-textarea.border-dark(
-        v-model="target"
-        rows="6"
-        placeholder="正規表現をチェックする対象を入力"
-      )
-    section
-      h2 正規表現
-      regular-pattern-textbox(
-        :prefix="'sandbox'"
-        :update_expression_callback="update_expression"
-        :update_options_callback="update_options_str"
-      )
+      h2 正規表現設定
+      template(v-if="selected == 'replace'")
+        b-badge.p-2.pb-3.font-weight-light(variant="secondary") 置換後文字列
+        b-form-input.position-relative.mt-n2.mb-2.border-secondary(
+          v-model='replacedStr'
+          placeholder="置換後の文字列を書いて下さい。"
+        )
+      template
+        b-badge.p-2.pb-3.font-weight-light(variant="secondary") ターゲット
+        b-form-textarea.position-relative.mt-n2.mb-2.border-secondary(
+          v-model="target"
+          rows="6"
+          placeholder="正規表現をチェックする対象を入力"
+        )
+      template
+        b-badge.p-2.pb-3.font-weight-light(variant="secondary") 正規表現
+        regular-pattern-textbox.position-relative.mt-n2.mb-2(
+          :prefix="'sandbox'"
+          :update_expression_callback="update_expression"
+          :update_options_callback="update_options_str"
+        )
     section
       h2
-        span {{selected}}の結果
+        span 実行結果
         b-badge.ml-2(variant="secondary" v-if="results") {{ results.length }}
       span(v-if="!results || results.length == 0") 結果はありません。
       ul.pl-1(v-else)
@@ -35,42 +37,48 @@ main#sandbox
           font-awesome-icon.mr-2.text-secondary(icon="check")
           span {{ result }}
     section
-      h2(v-b-toggle.collapse-num-vals)
-        span RegExp.$x変数
-        b-badge.ml-2(variant="secondary") {{ regexp_nums_count }}
-        font-awesome-icon.mx-2(:icon="show_num_vals ? 'angle-down' : 'angle-up'")
-      b-collapse#collapse-num-vals(v-model="show_num_vals")
-        b-table.pr-2(
-          style="overflow: hidden"
-          fill
-          striped
-          small
-          bordered
-          outlined
-          :items="regexp_nums"
-          thead-class="d-none"
-        )
-    section
       h2(v-b-toggle.collapse-vals)
-        span RegExpの変数
-        b-badge.ml-2(variant="secondary")
+        span RegExp変数
         font-awesome-icon.mx-2(:icon="show_vals ? 'angle-down' : 'angle-up'")
       b-collapse#collapse-vals(v-model="show_vals")
-        b-table.pr-2(
-          style="overflow: hidden"
-          fill
-          striped
-          small
-          bordered
-          outlined
-          :items="regexp_vals"
-          thead-class="d-none"
-        )
+        template
+          b-badge.p-2.pb-3.font-weight-light(variant="secondary") $n変数
+          b-table.mt-n2.pr-2.position-relative.bg-secondary.rounded-sm(
+            style="overflow: hidden"
+            fill
+            striped
+            small
+            bordered
+            outlined
+            hover
+            :fields="fields"
+            :items="regexp_nums"
+            thead-class="d-none"
+            tbody-class="bg-white"
+          )
+        template
+          b-badge.p-2.pb-3.font-weight-light(variant="secondary") 変数
+          b-table.mt-n2.pr-2.position-relative.bg-secondary.rounded-sm(
+            style="overflow: hidden"
+            fill
+            striped
+            small
+            bordered
+            outlined
+            hover
+            :items="regexp_vals"
+            thead-class="d-none"
+            tbody-class="bg-white"
+          )
 </template>
 
 <script>
 import RegularPatternTextbox from '@components/RegularPatternTextbox.vue'
 
+const FIELDS = [
+  { key: 'param' },
+  { key: 'value'}
+]
 const VAL_NAME = ['input', 'lastMatch', 'lastParen', 'leftContext', 'rightContext']
 const FUNC_SELECTION = [
   {text: 'match', value: 'match'},
@@ -95,7 +103,7 @@ export default {
       regexp_vals: [],
       selection: FUNC_SELECTION,
       selected: 'match',
-      show_num_vals: false,
+      fields: FIELDS,
       show_vals: false
     }
   },
@@ -132,10 +140,10 @@ export default {
           break
       }
       this.regexp_nums = [1,2,3,4,5,6,7,8,9].map( num => {
-        return { variable: `$${num}`, value: RegExp[`$${num}`] }
+        return { param: `$${num}`, value: RegExp[`$${num}`] }
       })
       this.regexp_vals = VAL_NAME.map( name => {
-        return { variable: name, value: RegExp[name] }
+        return { param: name, value: RegExp[name] }
       })
     },
     store_target: function() {
@@ -143,7 +151,7 @@ export default {
 		},
 		restore_target: function() {
 			let target = localStorage.getItem('target')
-			this.target = target ? target : ''
+      this.target = target ? target : ''
 		},
     update_expression: function(pattern) {
       this.pattern = pattern
@@ -177,6 +185,8 @@ export default {
 main
   table
     table-layout: fixed
+    tbody
+      background-color: red !important
     ::v-deep td
       &:first-of-type
         width: 20%

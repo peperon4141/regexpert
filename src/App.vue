@@ -47,7 +47,6 @@ body
   > main
     overflow-x: hidden
     overflow-y: scroll
-
   > footer
     min-height: 40px
     height: 40px
