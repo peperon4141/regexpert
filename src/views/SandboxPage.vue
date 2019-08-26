@@ -23,9 +23,8 @@ main#sandbox
       template
         b-badge.p-2.pb-3.font-weight-light(variant="secondary") 正規表現パターン
         regular-pattern-textbox.position-relative.mt-n2.mb-2(
-          :prefix="'sandbox'"
-          :update_expression_callback="updateExpression"
-          :update_options_callback="updateOptionsStr"
+          :pattern="pattern" v-on:input-pattern="pattern = $event.value"
+          :optionFlags="optionFlags" v-on:input-options="optionFlags = $event.value"
         )
     section
       h2
@@ -86,7 +85,6 @@ export default {
   data() {
     return {
       funcSelection: FUNC_SELECTION,
-      options_str: '',
       results: [],
       regexpNums: [],
       regexpVals: [],
@@ -96,20 +94,29 @@ export default {
     }
   },
   computed: {
+    optionsStr: function() { return this.optionFlags.join('') },
     regexp_nums_count: function () {
       return this.regexpNums ? this.regexpNums.filter( item => !!item.value ).length : 0
-    },
-    targetStr: {
-      get() { return this.$store.state.sandboxPage.target },
-      set(target) { this.$store.commit('setTarget', target); this.updateResults() }
     },
     funcType: {
       get() { return this.$store.state.sandboxPage.funcType },
       set(funcType) { this.$store.commit('setFuncType', funcType); this.updateResults() }
     },
+    pattern: {
+      get() { return this.$store.state.sandboxPage.pattern },
+      set(pattern) { this.$store.commit('setPattern', pattern); this.updateResults() }
+    },
+    optionFlags: {
+      get() { return this.$store.state.sandboxPage.optionFlags },
+      set(optionFlags) { this.$store.commit('setOptionFlags', optionFlags); this.updateResults() }
+    },
     replacement: {
       get() { return this.$store.state.sandboxPage.replacement },
       set(replacement) { this.$store.commit('setReplacement', replacement); this.updateResults() }
+    },
+    targetStr: {
+      get() { return this.$store.state.sandboxPage.target },
+      set(target) { this.$store.commit('setTarget', target); this.updateResults() }
     },
     showVals: {
       get() { return this.$store.state.sandboxPage.showVals },
@@ -117,11 +124,14 @@ export default {
     },
   },
   created: function() {
-    this.$store.commit('restoreValues')
+    this.$store.commit('restore', 'sandboxPage')
+  },
+  mounted: function() {
+    this.updateResults()
   },
   methods: {
     runRegexpFunc: function() {
-      const regexp = new RegExp(this.pattern, this.options_str)
+      const regexp = new RegExp(this.pattern, this.optionsStr)
       switch (this.funcType) {
         case 'match': return this.targetStr.match(regexp)
         case 'replace': return this.targetStr.replace(regexp, this.replacement)
@@ -138,14 +148,6 @@ export default {
       this.results = this.isArray ? result : [result]
       this.updateVariables()
       this.checkPerformance()
-    },
-    updateExpression: function(pattern) {
-      this.pattern = pattern
-      this.updateResults()
-    },
-    updateOptionsStr: function(options) {
-      this.options_str = options.join('')
-      this.updateResults()
     },
     initializeVariables: function() {
       ''.match(RegExp(''))

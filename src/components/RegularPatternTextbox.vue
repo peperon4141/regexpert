@@ -1,62 +1,50 @@
 <template lang="pug">
 #regular-pattern-textbox
 	b-form-input.border-secondary(
-		v-model='expression'
+		v-model='patternStr'
 		placeholder="正規表現式を書いてください"
 		aria-describedby="input-live-help input-live-feedback"
-		:state="check_regexp()"
+		:state="checkRegexp()"
 	)
 	b-form-invalid-feedback#input-live-feedback {{ error }}
 	b-form-checkbox-group(
-		v-model="selected_options"
-    :options="options"
+		v-model="optionsArray"
+    :options="optionSelection"
 	)
 </template>
 
 <script>
+const OPTION_SELECTION = [
+	{ value: 'i', text: 'i:ignore' },
+	{ value: 'g', text: 'g:global' },
+	{ value: 'm', text: 'm:multiline' },
+	{ value: 'u', text: 'u:unicode' }
+]
 export default {
   data() {
     return {
-      expression: '',
-			options: [
-				{ value: 'i', text: 'i:ignore' },
-				{ value: 'g', text: 'g:global' },
-				{ value: 'm', text: 'm:multiline' },
-				{ value: 'u', text: 'u:unicode' }
-			],
-			selected_options: [],
-			expression_local_strage_key: `${this.prefix}-expression`,
-			selected_options_local_strage_key: `${this.prefix}-selected_options`,
+			optionSelection: OPTION_SELECTION,
 			error: ''
     }
 	},
 	props: {
-		prefix: String,
-		update_expression_callback: Function,
-		update_options_callback: Function
+		pattern: { type: String, required: true, default: '' },
+		optionFlags: { type: Array, required: true, default: [] },
 	},
-	mounted: function () {
-		this.restore_expression()
-		this.restore_options()
+	computed: {
+		patternStr: {
+			get() { return this.pattern },
+			set(val) { if(this.checkRegexp()) { this.$emit('input-pattern', { value: val }) } }
+		},
+		optionsArray: {
+			get() { return this.optionFlags },
+			set(val) { if(this.checkRegexp()) { this.$emit('input-options', { value: val }) } }
+		}
 	},
   methods: {
-		store_expression: function() {
-			if (this.expression) localStorage.setItem(this.expression_local_strage_key, this.expression)
-		},
-		restore_expression: function() {
-			let expression = localStorage.getItem(this.expression_local_strage_key)
-			this.expression = expression ? expression : ''
-		},
-		store_options: function() {
-			if (this.selected_options) localStorage.setItem(this.selected_options_local_strage_key, JSON.stringify(this.selected_options))
-		},
-    restore_options: function() {
-			let selected_options = localStorage.getItem(this.selected_options_local_strage_key)
-      this.selected_options = (selected_options && JSON.parse(selected_options)) ? JSON.parse(selected_options) : []
-		},
-		check_regexp: function() {
+		checkRegexp: function() {
 			try {
-				new RegExp(this.expression, this.selected_options.join(''))
+				new RegExp(this.patternStr, this.optionsArray.join(''))
 				return true
 			} catch (error) {
 				this.error = error.message
@@ -64,20 +52,6 @@ export default {
 			}
 		}
   },
-  watch: { // 設定が変更されたらローカルストレージに保存する
-    expression(){
-			if (this.check_regexp()) {
-				this.store_expression()
-				this.update_expression_callback(this.expression)
-			}
-		},
-    selected_options() {
-			if (this.check_regexp()) {
-				this.store_options()
-				this.update_options_callback(this.selected_options)
-			}
-		}
-  }
 }
 </script>
 

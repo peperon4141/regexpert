@@ -3,7 +3,7 @@ import Router from 'vue-router'
 
 import SandboxPage from '@views/SandboxPage.vue'
 import CheetSheetPage from '@views/CheetSheetPage.vue'
-import QuizPage from '@views/QuizePage.vue'
+import QuizPage from '@views/QuizPage.vue'
 import AddQuizForm from '@views/AddQuizForm.vue'
 
 Vue.use(Router)
