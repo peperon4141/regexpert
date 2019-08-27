@@ -22,7 +22,7 @@ main
             ul.pl-0
               li.check-list.list-unstyled(v-for="(quiz, index) in okList")
                 font-awesome-icon.mx-2(
-                  icon="check-circle"
+                  :icon="[check-circle]"
                   :class="[ checkRegularExpression(quiz) ? 'text-success' : 'text-dark' ]"
                 )
                 span {{ quiz }}

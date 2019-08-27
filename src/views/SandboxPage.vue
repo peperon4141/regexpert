@@ -2,7 +2,14 @@
 main#sandbox
   article
     section
-      h2 関数選択
+      h2
+        span 関数選択
+        font-awesome-icon.ml-2.text-secondary(
+          :icon="['far', 'question-circle']"
+          v-b-modal.modal-1
+        )
+        b-modal#modal-1(title="説明" ok-only)
+          p.my-4 JavaScriptの正規表現に関する関数の選択ができます。
       b-form-group
         b-form-radio-group(v-model="funcType" :options="funcSelection")
     section
@@ -34,12 +41,12 @@ main#sandbox
       span(v-if="!results || results.length == 0") 結果はありません。
       ul.pl-1(v-else)
         li.list-unstyled(v-for="result in results")
-          font-awesome-icon.mr-2.text-secondary(icon="check")
+          font-awesome-icon.mr-2.text-secondary( :icon="['fas', 'check']" )
           span {{ result }}
     section
       h2(v-b-toggle.collapse-vals)
         span RegExp変数
-        font-awesome-icon.mx-2(:icon="showVals ? 'angle-down' : 'angle-up'")
+        font-awesome-icon.fa-lg.mx-2.text-secondary(:icon="['fas', 'angle-down']" :class="{'fa-flip-vertical': !showVals}")
       b-collapse#collapse-vals(v-model="showVals")
         template
           b-badge.p-2.pb-3.font-weight-light(variant="secondary") $n変数

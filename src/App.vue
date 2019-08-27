@@ -47,6 +47,7 @@ body
   > main
     overflow-x: hidden
     overflow-y: scroll
+    -webkit-overflow-scrolling: touch
   > footer
     min-height: 40px
     height: 40px
