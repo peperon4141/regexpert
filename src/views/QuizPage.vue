@@ -3,7 +3,7 @@ main
   b-spinner#spinner(v-if="quizzes.length <= 0")
   article.h-100.d-flex.flex-row(v-else)
     #contents.flex-grow-1.position-relative
-      section.w-100
+      section
         h2
           span クイズ :
           b-badge.mx-2(pill variant="secondary") LEVEL {{ currentQuiz.level }}
@@ -14,24 +14,24 @@ main
           :pattern="pattern" v-on:input-pattern="pattern = $event.value"
           :optionFlags="optionFlags" v-on:input-options="optionFlags = $event.value"
         )
-      section.w-100
+      section
         h2 結果
         b-row.d-flex.flex-row
           .col.flex-grow-1
             h3.text-success OK
             ul.pl-0
-              li.check-list.list-unstyled(v-for="(quiz, index) in okList")
-                font-awesome-icon.mx-2(
-                  :icon="[check-circle]"
+              li.check-list.list-unstyled.mb-2(v-for="(quiz, index) in okList")
+                font-awesome-icon.mr-2.fa-lg(
+                  :icon="['fas', 'check-circle']"
                   :class="[ checkRegularExpression(quiz) ? 'text-success' : 'text-dark' ]"
                 )
                 span {{ quiz }}
           .col.flex-grow-1
             h3.text-danger NG
             ul.pl-0
-              li.check-list.list-unstyled(v-for="quiz in ngList")
-                font-awesome-icon.mx-2(
-                  icon="check-circle"
+              li.check-list.list-unstyled.mb-2(v-for="quiz in ngList")
+                font-awesome-icon.mr-2.fa-lg(
+                  :icon="['fas','check-circle']"
                   :class="[ !checkRegularExpression(quiz) ? 'text-danger' : 'text-dark' ]"
                 )
                 span {{ quiz }}
@@ -56,7 +56,7 @@ main
           )
             b-badge.px-2(variant="primary" pill) {{ getQuizzesInLevel(level).length }}
             span {{ `level-${level}` }}
-            font-awesome-icon.mx-2(:icon="'angle-down'")
+            font-awesome-icon.mx-2(:icon="['angle-down']")
           b-collapse(
             :id="'accordion-' + index"
             role="tabpanel"
@@ -168,10 +168,10 @@ main
   .check-list
     display: flex
     align-items: center
-    svg
-      width: 20px
-      height: 20px
-      margin-left: 0 !important
+    // svg
+    //   width: 20px
+    //   height: 20px
+    //   margin-left: 0 !important
 
   .card
     margin-bottom: 12px

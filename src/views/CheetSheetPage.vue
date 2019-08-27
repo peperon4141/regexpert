@@ -18,8 +18,8 @@ main
         template(slot="sample" slot-scope="row")
           b-button(
             size="sm"
-            @click="row.toggleDetails"
-            :class="{disabled: 0 < (row.item.samples || []).length}"
+            @click="if (hasSamples(row.item)) { row.toggleDetails() }"
+            :class="{disabled: !hasSamples(row.item)}"
           ) 詳細
         template(slot="row-details" slot-scope="row")
           b-card(body-class="p-1")
@@ -98,6 +98,9 @@ export default {
         }
       ]
     }
+  },
+  methods: {
+    hasSamples: function(item) { return 0 < (item.samples || []).length }
   }
 }
 </script>

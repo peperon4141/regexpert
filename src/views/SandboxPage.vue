@@ -4,12 +4,9 @@ main#sandbox
     section
       h2
         span 関数選択
-        font-awesome-icon.ml-2.text-secondary(
-          :icon="['far', 'question-circle']"
-          v-b-modal.modal-1
-        )
-        b-modal#modal-1(title="説明" ok-only)
-          p.my-4 JavaScriptの正規表現に関する関数の選択ができます。
+        font-awesome-icon.ml-2.text-secondary(:icon="['far', 'question-circle']" v-b-modal.modal-func-select)
+        b-modal#modal-func-select(title="説明" ok-only)
+          p JavaScriptの正規表現に関する関数の選択ができます。
       b-form-group
         b-form-radio-group(v-model="funcType" :options="funcSelection")
     section
@@ -36,6 +33,11 @@ main#sandbox
     section
       h2
         span 実行結果
+        template
+          font-awesome-icon.ml-2.text-secondary(:icon="['far', 'question-circle']" v-b-modal.modal-run-func)
+          b-modal#modal-run-func(title="説明" ok-only)
+            p timeは関数を{{repeatCount}}回実行した平均msを表示しています。参考程度の実行時間です。
+            p countは関数が配列の戻り値の場合の配列の要素数です。
         b-badge.ml-2(variant="secondary" v-if="time") time: {{ time }}[ms]
         b-badge.ml-2(variant="secondary" v-if="isArray") count: {{ results.length }}
       span(v-if="!results || results.length == 0") 結果はありません。
@@ -97,7 +99,8 @@ export default {
       regexpVals: [],
       time: null,
       isArray: false,
-      fields: FIELDS
+      fields: FIELDS,
+      repeatCount: REPEAT_COUNT
     }
   },
   computed: {
