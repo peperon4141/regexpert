@@ -3,11 +3,11 @@ import Vuex from 'vuex'
 
 Vue.use(Vuex)
 
-function storeValues(pageName: string, state: object) {
+function storeValues(pageName: string, state: any) {
   localStorage.setItem(`store_${pageName}`, JSON.stringify(state[pageName]))
 }
 
-function restoreValues(pageName: string, state: object) {
+function restoreValues(pageName: string, state: any) {
   const storedValues = localStorage.getItem(`store_${pageName}`)
   if (storedValues) { Object.assign(state[pageName], JSON.parse(storedValues)) }
 }
@@ -17,7 +17,7 @@ export default new Vuex.Store({
     sandboxPage: {
       funcType: 'match',
       target: 'aaa@gmail.com\nbbb@gmail.com',
-      pattern: '^.*?@gmail\.com',
+      pattern: '^.*?@gmail\\.com',
       optionFlags: [],
       replacement: 'test',
       showVals: false

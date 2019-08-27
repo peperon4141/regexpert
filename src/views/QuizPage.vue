@@ -43,7 +43,7 @@ main
     #sidebar.border-left.d-none.d-sm-block.d-md-block
       section
         h2 クイズ選択
-        b-card(
+        b-card.border-secondary.overflow-hidden(
           header-tag="header"
           no-body
           v-for="(level, index) in levels"
@@ -87,13 +87,11 @@ export default {
   created: function() {
     this.$store.commit('restore', 'quizPage')
     var that = this
-    console.log('--------1')
     axios.get('https://script.google.com/macros/s/AKfycbwX35ewjC6DxJV8ehrtI8nex0X3KWKYYv2kEYJJcISfTaYfMX8/exec')
       .then((res) => {
         let quizzes = res.data
         that.quizzes = quizzes.sort( (left, right) => left.level < right.level )
         that.currentQuiz = that.quizzes[0]
-        console.log(that.currentQuiz)
       })
       .catch((res) => {
         console.log(res)

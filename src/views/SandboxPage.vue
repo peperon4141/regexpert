@@ -76,7 +76,7 @@ const FUNC_SELECTION = [
   {text: 'search', value: 'search' },
   {text: 'split', value: 'split' }
 ]
-const REPEAT_COUNT = 100
+const REPEAT_COUNT = 1000
 
 export default {
   components: {
@@ -143,11 +143,13 @@ export default {
     },
     updateResults: function() {
       this.initializeVariables()
-      var result = this.runRegexpFunc()
-      this.isArray = Array.isArray(result)
-      this.results = this.isArray ? result : [result]
-      this.updateVariables()
-      this.checkPerformance()
+      try {
+        var result = this.runRegexpFunc()
+        this.isArray = Array.isArray(result)
+        this.results = this.isArray ? result : [result]
+        this.updateVariables()
+        this.checkPerformance()
+      } catch (e) {}
     },
     initializeVariables: function() {
       ''.match(RegExp(''))

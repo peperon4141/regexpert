@@ -1,14 +1,14 @@
 <template lang="pug">
 #regular-pattern-textbox
 	b-form-input.border-secondary(
-		v-model='patternStr'
+		v-model="computedPattern"
 		placeholder="正規表現式を書いてください"
 		aria-describedby="input-live-help input-live-feedback"
-		:state="checkRegexp()"
+		:state="checkRegexp(computedPattern, computedOptionFlags)"
 	)
 	b-form-invalid-feedback#input-live-feedback {{ error }}
 	b-form-checkbox-group(
-		v-model="optionsArray"
+		v-model="computedOptionFlags"
     :options="optionSelection"
 	)
 </template>
@@ -32,19 +32,19 @@ export default {
 		optionFlags: { type: Array, required: true, default: [] },
 	},
 	computed: {
-		patternStr: {
+		computedPattern: {
 			get() { return this.pattern },
-			set(val) { if(this.checkRegexp()) { this.$emit('input-pattern', { value: val }) } }
+			set(val) { this.$emit('input-pattern', { value: val }) }
 		},
-		optionsArray: {
+		computedOptionFlags: {
 			get() { return this.optionFlags },
-			set(val) { if(this.checkRegexp()) { this.$emit('input-options', { value: val }) } }
+			set(val) { this.$emit('input-options', { value: val }) }
 		}
 	},
   methods: {
-		checkRegexp: function() {
+		checkRegexp: function(pattern, optionFlags) {
 			try {
-				new RegExp(this.patternStr, this.optionsArray.join(''))
+				new RegExp(pattern, optionFlags.join(''))
 				return true
 			} catch (error) {
 				this.error = error.message
