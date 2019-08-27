@@ -32,7 +32,11 @@ main
 export default {
   data() {
     return {
-      fields: ['char', 'description', 'sample'],
+      fields: [
+        { key: 'char', tdClass: 'align-middle' },
+        { key: 'description', tdClass: 'align-middle' },
+        { key: 'sample', tdClass: ['text-center', 'align-middle'] }
+      ],
       contents: [
         {
           name: '文字クラス',
@@ -116,5 +120,5 @@ main
         width: 20%
         word-wrap: break-word
       &:last-of-type
-        width: 58px
+        width: 52px
 </style>

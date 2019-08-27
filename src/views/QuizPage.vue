@@ -56,7 +56,7 @@ main
           )
             b-badge.px-2(variant="primary" pill) {{ getQuizzesInLevel(level).length }}
             span {{ `level-${level}` }}
-            font-awesome-icon.mx-2(:icon="['fas', 'angle-down']")
+            font-awesome-icon.mx-2.fa-lg.text-secondary(:icon="['fas', 'angle-down']")
           b-collapse(
             :id="'accordion-' + index"
             role="tabpanel"
@@ -168,10 +168,6 @@ main
   .check-list
     display: flex
     align-items: center
-    // svg
-    //   width: 20px
-    //   height: 20px
-    //   margin-left: 0 !important
 
   .card
     margin-bottom: 12px
