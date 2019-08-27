@@ -4,7 +4,7 @@ main#sandbox
     section
       h2
         span 関数選択
-        font-awesome-icon.ml-2.text-secondary(:icon="['far', 'question-circle']" v-b-modal.modal-func-select)
+          .ml-2.text-secondary(:icon="['far', 'question-circle']" v-b-modal.modal-func-select)
         b-modal#modal-func-select(title="説明" ok-only)
           p JavaScriptの正規表現に関する関数の選択ができます。
       b-form-group
@@ -158,7 +158,7 @@ export default {
         this.isArray = Array.isArray(result)
         this.results = this.isArray ? result : [result]
         this.updateVariables()
-        this.checkPerformance()
+        // this.checkPerformance()
       } catch (e) {}
     },
     initializeVariables: function() {

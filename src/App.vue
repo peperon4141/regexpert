@@ -1,6 +1,6 @@
 <template lang="pug">
 body.d-flex.flex-column
-  header.bg-dark.sticky-top
+  header.bg-dark.sticky-top.shadow-sm
     b-navbar(toggleable="sm" type="dark")
       b-navbar-brand.font-italic.m-0(variant="faded" tag="h1") Regexpert
       b-navbar-toggle.border-0(target="nav-collapse")
@@ -11,7 +11,7 @@ body.d-flex.flex-column
             :to="item.to"
           ) {{ item.name }}
   router-view.flex-grow-1.bg-white
-  footer.bg-dark.sticky-bottom.d-flex.justify-content-center.align-items-center
+  footer.bg-dark.sticky-bottom.d-flex.justify-content-center.align-items-center.shadow-sm
     span.text-light Created by Tohru Ver. 0.2
 </template>
 

@@ -56,7 +56,7 @@ main
           )
             b-badge.px-2(variant="primary" pill) {{ getQuizzesInLevel(level).length }}
             span {{ `level-${level}` }}
-            font-awesome-icon.mx-2(:icon="['angle-down']")
+            font-awesome-icon.mx-2(:icon="['fas', 'angle-down']")
           b-collapse(
             :id="'accordion-' + index"
             role="tabpanel"
@@ -90,7 +90,7 @@ export default {
     axios.get('https://script.google.com/macros/s/AKfycbwX35ewjC6DxJV8ehrtI8nex0X3KWKYYv2kEYJJcISfTaYfMX8/exec')
       .then((res) => {
         let quizzes = res.data
-        that.quizzes = quizzes.sort( (left, right) => left.level < right.level )
+        that.quizzes = quizzes.sort( (left, right) => left.level < right.level ? -1 : 0)
         that.currentQuiz = that.quizzes[0]
       })
       .catch((res) => {
