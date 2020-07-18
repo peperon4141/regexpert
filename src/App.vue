@@ -1,25 +1,20 @@
 <template lang="pug">
 body.d-flex.flex-column
-  header.bg-dark.sticky-top.shadow-sm
-    b-navbar(toggleable="sm" type="dark")
-      b-navbar-brand.font-italic.m-0(variant="faded" tag="h1") Regexpert
-      b-navbar-toggle.border-0(target="nav-collapse")
-      b-collapse#nav-collapse(is-nav)
-        b-navbar-nav.ml-auto
-          b-nav-item.mx-3(
-            v-for="item in routes"
-            :to="item.to"
-          ) {{ item.name }}
+  custom-header(:routes="routes")
   router-view.flex-grow-1.bg-white
-  footer.bg-dark.sticky-bottom.d-flex.justify-content-center.align-items-center.shadow-sm
-    span.text-light Created by Tohru Ver. 0.3
+  custom-footer
 </template>
 
 <script>
 import 'normalize.css'
+import CustomHeader from '@components/Header.vue'
+import CustomFooter from '@components/Footer.vue'
 
 export default {
-  name: 'App',
+  components: {
+    CustomHeader,
+    CustomFooter
+  },
   data() {
     return {
       routes: [
