@@ -19,7 +19,7 @@ export default {
     return {
       routes: [
         {name: 'クイズ', to: '/quiz'},
-        {name: 'テスト', to: '/sandbox'},
+        {name: 'サンドボックス', to: '/sandbox'},
         {name: 'チートシート', to: '/cheetsheet'},
         // {name: 'クイズ追加', to: '/form'},
       ]
@@ -31,7 +31,7 @@ export default {
 <style lang="sass">
 html, body
   height: 100%
-  font-size: 12px
+  font-size: 16px
 
 html
   scroll-behavior: smooth
@@ -46,6 +46,8 @@ body
     overflow-scrolling: auto
     -webkit-overflow-scrolling: auto
   > footer
-    min-height: 40px
-    height: 40px
+    min-height: 100px
+    height: 100px
+    padding: 0 20px
+    flex-direction: row
 </style>

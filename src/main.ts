@@ -12,6 +12,9 @@ Vue.use(BootstrapVue)
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
+// クリップボード追加
+import VueClipboard from 'vue-clipboard2'
+Vue.use(VueClipboard)
 
 // Fontawesome の設定
 import { library, IconPack } from '@fortawesome/fontawesome-svg-core'

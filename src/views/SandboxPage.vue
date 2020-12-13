@@ -1,74 +1,79 @@
 <template lang="pug">
 main#sandbox
+  b-alert(
+    style="position: absolute; margin-top: 10px; left: 45%; z-index: 100;"
+    dismissible
+    fade
+    :show="showCopyAlertTime"
+    @dismissed="showCopyAlertTime=0"
+  ) Copied
   article
     section
       h2
         span 関数選択
-          .ml-2.text-secondary(:icon="['far', 'question-circle']" v-b-modal.modal-func-select)
-        b-modal#modal-func-select(title="説明" ok-only)
-          p JavaScriptの正規表現に関する関数の選択ができます。
-      b-form-group
-        b-form-radio-group(v-model="funcType" :options="funcSelection")
+        font-awesome-icon.ml-2.text-secondary(:icon="['far', 'question-circle']" v-b-modal.modal-select-func)
+        b-modal#modal-select-func(title="説明" ok-only hide-header) JavaScriptの正規表現に関する関数の選択ができます。
+      b-form-radio-group(v-model="funcType" :options="funcSelection" button-variant="outline-secondary")
     section
-      h2 正規表現設定
-      template(v-if="funcType == 'replace'")
-        b-badge.p-2.pb-3.font-weight-light(variant="secondary") 置換後文字列
-        b-form-input.position-relative.mt-n2.mb-2.border-secondary(
-          v-model='replacement'
-          placeholder="置換後の文字列を書いて下さい。"
-        )
+      h2
+        span 正規表現設定
+        font-awesome-icon.ml-2.text-secondary(:icon="['far', 'question-circle']" v-b-modal.modal-regex-config)
+        b-modal#modal-regex-config(title="説明" ok-only hide-header) 正規表現パターンと、対象となる文字列を入力します。
       template
-        b-badge.p-2.pb-3.font-weight-light(variant="secondary") ターゲット文字列
-        b-form-textarea.position-relative.mt-n2.mb-2.border-secondary(
-          v-model="targetStr"
-          rows="6"
-          placeholder="正規表現をチェックする対象を入力"
-        )
-      template
-        b-badge.p-2.pb-3.font-weight-light(variant="secondary") 正規表現パターン
-        regular-pattern-textbox.position-relative.mt-n2.mb-2(
+        b-badge.p-2.font-weight-light(variant="secondary") 正規表現パターン
+        regular-pattern-textbox.position-relative.mt-n1.mb-2(
           :pattern="pattern" v-on:input-pattern="pattern = $event.value"
           :optionFlags="optionFlags" v-on:input-options="optionFlags = $event.value"
+        )
+      template(v-if="funcType == 'replace'")
+        b-badge.p-2.font-weight-light(variant="secondary") 置換後文字列
+        b-form-input.position-relative.mt-n1.mb-2.border-secondary(
+          v-model='replacement'
+          placeholder="置換後の文字列を書いて下さい。"
         )
     section
       h2
         span 実行結果
-        template
-          font-awesome-icon.ml-2.text-secondary(:icon="['far', 'question-circle']" v-b-modal.modal-run-func)
-          b-modal#modal-run-func(title="説明" ok-only)
-            p timeは関数を{{repeatCount}}回実行した平均msを表示しています。参考程度の実行時間です。
-            p countは関数が配列の戻り値の場合の配列の要素数です。
-        b-badge.ml-2(variant="secondary" v-if="time") time: {{ time }}[ms]
+        font-awesome-icon.ml-2.text-secondary(:icon="['far', 'question-circle']" v-b-modal.modal-run-func)
+        b-modal#modal-run-func(title="説明" ok-only hide-header) countは関数が配列の戻り値の場合の配列の要素数です。
         b-badge.ml-2(variant="secondary" v-if="isArray") count: {{ results.length }}
-      span(v-if="!results || results.length == 0") 結果はありません。
-      ul.pl-1(v-else)
-        li.list-unstyled(v-for="result in results")
-          font-awesome-icon.mr-2.text-secondary( :icon="['fas', 'check']" )
-          span {{ result }}
-    section
-      h2(v-b-toggle.collapse-vals)
-        span RegExp変数
-        font-awesome-icon.fa-lg.mx-2.text-secondary(:icon="['fas', 'angle-down']" :class="{'fa-flip-vertical': !showVals}")
+      template
+        b-badge.p-2.font-weight-light(variant="secondary") ターゲット文字列
+        b-form-textarea.position-relative.mt-n1.mb-2.border-secondary(
+          v-model="targetStr"
+          rows="2"
+          placeholder="正規表現をチェックする対象を入力"
+        )
+      template
+        span(v-if="!results || results.length == 0") 結果はありません。
+        template(v-else)
+          b-input-group.mb-2
+            b-form-input(v-model="formula" disabled)
+            b-input-group-append
+              b-button(
+                v-clipboard:copy="formula"
+                v-clipboard:success="showAlert"
+              )
+                font-awesome-icon.text-white(:icon="['far', 'copy']" )
+          ul.pl-1
+            li.list-unstyled(v-for="result in results")
+              font-awesome-icon.mr-2.text-secondary( :icon="['fas', 'check']" )
+              span {{ result }}
+        b-badge.p-2.font-weight-light(variant="secondary" v-b-toggle.collapse-vals)
+          span Regex変数 詳細
+          font-awesome-icon.fa-lg.mx-2.text-white(:icon="['fas', 'angle-down']" :class="{'fa-flip-vertical': !showVals}")
       b-collapse#collapse-vals(v-model="showVals")
-        template
-          b-badge.p-2.pb-3.font-weight-light(variant="secondary") $n変数
-          b-table.mt-n2.pr-2.position-relative.bg-secondary.rounded-sm(
-            style="overflow: hidden"
-            :fields="fields"
-            :items="regexpNums"
-            thead-class="d-none"
-            tbody-class="bg-white"
-            fill striped small bordered outlined hover
-          )
-        template
-          b-badge.p-2.pb-3.font-weight-light(variant="secondary") 変数
-          b-table.mt-n2.pr-2.position-relative.bg-secondary.rounded-sm(
-            style="overflow: hidden"
-            :items="regexpVals"
-            thead-class="d-none"
-            tbody-class="bg-white"
-            fill striped small bordered outlined hover
-          )
+        b-table.mt-n1.pr-2.position-relative.bg-secondary.rounded-sm(
+          style="overflow: hidden"
+          :items="[...regexpNums, ...regexpVals]"
+          thead-class="d-none"
+          tbody-class="bg-white"
+          fill striped small bordered outlined hover
+        )
+    //- section
+    //-   h2(v-b-toggle.collapse-vals)
+    //-     span RegExp変数
+    //-     font-awesome-icon.fa-lg.mx-2.text-secondary(:icon="['fas', 'angle-down']" :class="{'fa-flip-vertical': !showVals}")
 </template>
 
 <script>
@@ -100,7 +105,9 @@ export default {
       time: null,
       isArray: false,
       fields: FIELDS,
-      repeatCount: REPEAT_COUNT
+      repeatCount: REPEAT_COUNT,
+      formula: '',
+      showCopyAlertTime: 0
     }
   },
   computed: {
@@ -141,15 +148,16 @@ export default {
   },
   methods: {
     runRegexpFunc: function() {
-      const regexp = new RegExp(this.pattern, this.optionsStr)
+      const regexp = `/${this.pattern}/${this.optionsStr}`
       switch (this.funcType) {
-        case 'match': return this.targetStr.match(regexp)
-        case 'replace': return this.targetStr.replace(regexp, this.replacement)
-        case 'exec': return regexp.exec(this.targetStr)
-        case 'test': return regexp.test(this.targetStr)
-        case 'search': return this.targetStr.search(regexp)
-        case 'split': return this.targetStr.split(regexp)
+        case 'match': this.formula = `\`${this.targetStr}\`.match(${regexp})`; break;
+        case 'replace': this.formula = `\`${this.targetStr}\`.replace(${regexp}, '${this.replacement}')`; break;
+        case 'exec': this.formula = `${regexp}.exec(\`${this.targetStr}\`)`; break;
+        case 'test': this.formula = `${regexp}.test(\`${this.targetStr}\`)`; break;
+        case 'search': this.formula = `\`${this.targetStr}\`.search(${regexp})`; break;
+        case 'split': this.formula = `${regexp}.split(\`${this.targetStr}\`)`; break;
       }
+      return eval(this.formula)
     },
     updateResults: function() {
       this.initializeVariables()
@@ -158,7 +166,6 @@ export default {
         this.isArray = Array.isArray(result)
         this.results = this.isArray ? result : [result]
         this.updateVariables()
-        // this.checkPerformance()
       } catch (e) {}
     },
     initializeVariables: function() {
@@ -170,14 +177,8 @@ export default {
       this.regexpNums = NUM_PARAM_NAMES.map( key => { return { param: key, value: RegExp[key] } })
       this.regexpVals = OTHER_PARAM_NAMES.map( key => { return { param: key, value: RegExp[key].toString() } })
     },
-    checkPerformance: function() {
-      this.time = null
-      setTimeout( () => {
-        var start = performance.now()
-        for(let i = 0; i < REPEAT_COUNT; i++){ this.runRegexpFunc() }
-        var end = performance.now()
-        this.time = ((end - start) / REPEAT_COUNT).toFixed(3)
-      }, 10)
+    showAlert: function() {
+      this.showCopyAlertTime = 1
     }
   }
 }
